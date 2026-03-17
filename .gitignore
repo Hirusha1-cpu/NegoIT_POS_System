@@ -1,0 +1,37 @@
+# IDE files
+/.idea
+/.vscode
+*.swp
+*.swo
+
+# Log files
+*.log
+logfile.log
+
+# Environment files
+.env
+.env.local
+config.local.php
+
+# Cache files
+/cache
+/tmp
+*.cache
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backups
+*.BACKUP
+*.backup
+*_backup.php
+*_2023_*.php
+*_2024_*.php
+*_2025_*.php
+*_2026_*.php
+
