@@ -1,0 +1,43 @@
+<?php
+                include_once  'template/m_header.php';
+?>
+<!-- ------------------------------------------------------------------------------------ -->
+<?php 
+	if(isset($_REQUEST['id'])) $id=$_REQUEST['id']; else $id=0;
+?>
+</head>
+
+<div class="w3-container" style="margin-top:75px">
+<?php 
+	if(isset($_REQUEST['message'])){
+		if($_REQUEST['re']=='success') $color='green'; else $color='red';
+	print '<span style="color:'.$color.'; font-weight:bold;font-size:large;">'.$_REQUEST['message'].'</span>'; 
+	}
+?>	
+
+<hr>
+<div class="w3-row">
+  <div class="w3-col s3">
+  </div>
+  <div class="w3-col">
+	<table align="center" height="100%" style="font-family:Calibri">
+	<tr><th align="center" style="background-color:#DDDDDD;">Salesman</th><th colspan="3" align="left" style="background-color:#EEEEEE; color:navy; padding-left:30px;"><?php print ucfirst($salesman_name); ?></th></tr>
+	<tr><td colspan="4" style="border:0; background-color:white">&nbsp;</td></tr>
+	<tr style="background-color:#DDDDDD;"><th width="100px">Invoice No</th><th width="100px">Date</th><th width="150px">Invoice Price</th><th width="150px">Invoice Profit</th></tr>
+	<?php
+	$inv=0;
+	for($i=0;$i<sizeof($invoice_no);$i++){
+			print '<tr style="background-color:#EEEEEE;"><td align="center"><a href="index.php?components=billing&action=finish_bill&id='.$invoice_no[$i].'">'.str_pad($invoice_no[$i], 7, "0", STR_PAD_LEFT).'</a></td><td width="50px" align="center" >'.$time[$i].'</td><td align="right" style="padding-right:10px;">'.number_format($invoice_total[$i]).'</td><td align="right" style="padding-right:10px;">'.number_format($invoice_profit[$i]).'</td></tr>';
+	}
+	?>	
+	</table>
+
+  </div>
+</div>
+</div>
+<hr>
+
+
+<?php
+                include_once  'template/m_footer.php';
+?>

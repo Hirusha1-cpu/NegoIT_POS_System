@@ -1,0 +1,371 @@
+<?php
+	include_once  'template/header.php';
+	$cust_odr=$_GET['cust_odr'];
+    $bill_salesman=$_COOKIE['user_id'];
+    if(isset($_GET['s'])){ if($_GET['s']!='')  $bill_salesman=$_GET['s']; }
+	if($cust_odr=='yes') $main_tale_color='#C6DEFE'; else $main_tale_color='#E5E5E5';
+?>
+<style>
+	#cust-list{float:left;list-style:none;margin-top:-3px;padding:0;width:190px;position: absolute;}
+	#cust-list li{padding: 10px; background: #F8F8F8; border-bottom: #bbb9b9 1px solid;}
+	#cust-list li:hover{background:#ece3d2;cursor: pointer;}
+	#search-cust{padding: 10px;border: #a8d4b1 1px solid;border-radius:4px;}
+	#mob-list{float:left;list-style:none;margin-top:-3px;padding:0;width:190px;position: absolute;}
+	#mob-list li{padding: 10px; background: #F8F8F8; border-bottom: #bbb9b9 1px solid;}
+	#mob-list li:hover{background:#ece3d2;cursor: pointer;}
+	#search-mob{padding: 10px;border: #a8d4b1 1px solid;border-radius:4px;}
+	#sm-list{float:left;list-style:none;margin-top:-3px;padding:0;width:190px;position: absolute;}
+	#sm-list li{padding: 10px; background: #F8F8F8; border-bottom: #bbb9b9 1px solid;}
+	#sm-list li:hover{background:#ece3d2;cursor: pointer;}
+	#search-sm{padding: 10px;border: #a8d4b1 1px solid;border-radius:4px;}
+</style>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+<script>
+	$(document).ready(function(){
+		$("#search-cust").keyup(function(){
+			if(document.getElementById('search-cust').value.length>2){
+				$.ajax({
+				type: "POST",
+				url: "index.php?components=bill2&action=cust-list",
+				data:'keyword='+$(this).val(),
+				beforeSend: function(){
+					$("#search-cust").css("background","#FFF url(images/LoaderIcon.gif) no-repeat 165px");
+				},
+				success: function(data){
+					$("#suggesstion-cust").show();
+					$("#suggesstion-cust").html(data);
+					$("#search-cust").css("background","#FFF");
+				}
+				});
+			}
+		});
+		$("#search-mob").keyup(function(){
+			if(document.getElementById('search-mob').value.length>3){
+				$.ajax({
+				type: "POST",
+				url: "index.php?components=bill2&action=mob-list",
+				data:'keyword='+$(this).val(),
+				beforeSend: function(){
+					$("#search-mob").css("background","#FFF url(images/LoaderIcon.gif) no-repeat 165px");
+				},
+				success: function(data){
+					$("#suggesstion-mob").show();
+					$("#suggesstion-mob").html(data);
+					$("#search-mob").css("background","#FFF");
+				}
+				});
+			}
+		});
+		$("#search-sm").keyup(function(){
+			if(document.getElementById('search-sm').value.length>2){
+				$.ajax({
+				type: "POST",
+				url: "index.php?components=bill2&action=sm-list",
+				data:'keyword='+$(this).val(),
+				beforeSend: function(){
+					$("#search-sm").css("background","#FFF url(images/LoaderIcon.gif) no-repeat 165px");
+				},
+				success: function(data){
+					$("#suggesstion-sm").show();
+					$("#suggesstion-sm").html(data);
+					$("#search-sm").css("background","#FFF");
+				}
+				});
+			}
+		});
+	});
+
+	function selectCust(val) {
+		$("#search-cust").val(val);
+		$("#suggesstion-cust").hide();
+		getCustData('name',val);
+	}
+
+	function selectMob(val) {
+		$("#search-mob").val(val);
+		$("#suggesstion-mob").hide();
+		getCustData('mob',val);
+	}
+
+	function selectSM(val) {
+		$("#search-sm").val(val);
+		$("#suggesstion-sm").hide();
+		getSM(val);
+	}
+
+	function getCustData($case,$val){
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+			if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				var myObj = JSON.parse(xmlhttp.responseText);
+				document.getElementById('cust_id').value=myObj.cust_id;
+				if($case=='name'){
+					if(document.getElementById('search-mob')) document.getElementById('search-mob').value=myObj.cust_mobile;
+				}
+				if($case=='mob'){
+					if(document.getElementById('search-cust')) document.getElementById('search-cust').value=myObj.cust_name;
+				}
+			}
+		};
+		xmlhttp.open("POST", "index.php?components=bill2&action=more_cust", true);
+		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlhttp.send('case='+$case+'&val='+$val);
+	}
+
+	function getSM($val){
+		document.getElementById('div_sm').innerHTML=document.getElementById('loading').innerHTML;
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+			if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					var returntext=this.responseText;
+					document.getElementById('div_sm').innerHTML='';
+					document.getElementById('sm_id').value=returntext;
+				}
+			};
+		xmlhttp.open("POST", "index.php?components=bill2&action=more_sm", true);
+		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlhttp.send('val='+$val);
+	}
+
+	function createTMPBill(){
+		$cust_odr=document.getElementById('cust_odr').value;
+		$sm_id=document.getElementById('sm_id').value;
+		$cust_id=document.getElementById('cust_id').value;
+		$gps_x=document.getElementById('gps_x').value;
+		$gps_y=document.getElementById('gps_y').value;
+		if($cust_id==''){
+			alert('Please Select the Customer or Phone Number');
+			return false;
+		}else{
+			document.getElementById('div_submit').innerHTML=document.getElementById('loading').innerHTML;
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+				if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					var returntext=this.responseText;
+					if(returntext!=''){
+						var myObj = JSON.parse(this.responseText);
+							if(myObj.msg=='Done'){
+								document.getElementById('notifications').innerHTML='<span style="color:green; font-weight:bold; font-size:12pt;">Bill Created</span>';
+								// console.log(myObj.bm_no);
+								window.location = 'index.php?components=bill2&action=bill_item&cust_odr='+$cust_odr+'&bill_no='+myObj.bm_no;
+							}else{
+								document.getElementById('notifications').innerHTML='<span style="color:red; font-weight:bold; font-size:12pt;">'+myObj.msg+'</span>';
+								document.getElementById('div_submit').innerHTML='<input type="button" value="Submit" onclick="createTMPBill()" style="width:100px; height:50px;" />';
+							}
+						}
+					}
+				};
+			xmlhttp.open("POST", "index.php?components=bill2&action=new_tmp_bill", true);
+			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xmlhttp.send('cust_odr='+$cust_odr+'&cust_id='+$cust_id+'&sm_id='+$sm_id+'&gps_x='+$gps_x+'&gps_y='+$gps_y);
+		}
+	}
+
+	function BMCreateCust($case){
+		$cust_odr=document.getElementById('cust_odr').value;
+		$sm_id=document.getElementById('sm_id').value;
+		if($case === 'onetime_cust'){
+			$mob=document.getElementById('search-mob').value;
+		}else{
+			$mob=0;
+		}
+
+		window.location = 'index.php?components=bill2&action='+$case+'&sm_id='+$sm_id+'&cust_odr='+$cust_odr+'&mob='+$mob;
+	}
+
+	function removeLeadingZeros() {
+		var inputValue = document.getElementById('search1').value; // Get the input value
+		var trimmedValue = inputValue.replace(/^0+/, ''); // Remove leading zeros
+		document.getElementById('search1').value = trimmedValue; // Update the input field with the trimmed value
+	}
+</script>
+
+<?php
+	if (isset($_REQUEST['message'])){
+		if ($_REQUEST['re'] == 'success') $color = 'green';	else $color = '#DD3333';
+		if(strpos($_REQUEST['message'],'|')==false){
+			$message='<span style="color:'.$color.'; font-weight:bold;font-size:12pt;">'.$_REQUEST['message'].'</span>';
+		}else{
+			$messages=explode("|",$_REQUEST['message']);
+			$message='<span style="color:green; font-weight:bold;font-size:12pt;">'.$messages[0].'</span> | <span style="color:#DD3333; font-weight:bold;font-size:12pt;">'.$messages[1].'</span>';
+		}
+		print '<script type="text/javascript">document.getElementById("notifications").innerHTML=\''.$message.'\'</script>';
+	}
+?>
+
+<div id="loading" style="display:none"><img src="images/loading.gif" style="width:40px" /></div>
+
+<table align="center" style="font-size:10pt; font-family:Calibri">
+	<tr>
+		<td valign="top" align="center">
+			<div style="background-color:#EEEEEF; border-radius: 15px; padding-left:10px; padding-right:10px">
+				<table width="100%">
+					<tr>
+						<td>
+							<h1 style="color:#2277DD"><?php if($cust_odr=='no') print 'Sales Billing'; else print 'Cust Order'; ?></h1>
+						</td>
+						<?php
+							if(isset($_GET['cust'])){
+								if(isset($tm_template)){
+									if($tm_template==2){
+										if($_COOKIE['fastprint']=='on') $checked='checked="checked"'; else $checked='';
+										print '<td style="vertical-align:middle; font-size:10pt">Fast Print <input type="checkbox" onchange="window.location = '."'".'index.php?components=bill2&action=setfastprint&id='.$_GET["id"].'&s='.$_GET["s"].'&cust='.$_GET["cust"]."'".'"  '.$checked.' /></td>';
+									}
+								}
+							}
+						?>
+						<td align="right">
+							<select name="district" id="district" onchange="setDistrict2('bill2')" <?php if($static_district!=0) print 'disabled="disabled"'; ?> >
+								<option>-SELECT-</option>
+								<?php for($i=0;$i<sizeof($district_id);$i++){
+										if($current_district==$district_id[$i]){
+											$select='selected="selected"';
+											$style='style="color:red; font-weight:bold;"';
+										}else{
+											$select='';
+											$style='';
+										}
+										print '<option '.$select.' '.$style.'  value="'.$district_id[$i].'">'.$district_name[$i].'</option>';
+								} ?>
+
+							</select>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<input type="hidden" id="gps_x" name="gps_x" value="0" />
+			<input type="hidden" id="gps_y" name="gps_y" value="0" />
+			<input type="hidden" id="sm_id" name="bill_sm" value="<?php print $bill_salesman; ?>" />
+			<input type="hidden" id="cust_odr" value="<?php print $cust_odr; ?>" />
+			<input type="hidden" id="cust_id" name="cust_id" value="" />
+
+			<?php if($current_district!=''){ ?>
+				<table align="center" bgcolor="<?php print $main_tale_color; ?>" style="border-radius: 15px;" border="0">
+					<tr><td colspan="5"><br /></td></tr>
+					<?php
+						print '<tr><td width="50px"></td><td style="font-size:12pt">Customer</td><td colspan="2">
+							<div class="frmSearch">
+							<input type="text" id="search-cust" placeholder="Customer Name" autocomplete="nope" />
+							<div id="suggesstion-cust"></div>
+							</div>
+						</td><td width="50px"><div id="div_cname"></div></td></tr>';
+						if($_COOKIE['retail']==1)
+							print '<tr><td width="50px"></td><td style="font-size:12pt">Mobile</td><td colspan="2">
+							<div class="frmSearch">
+							<input type="text" id="search-mob" autocomplete="nope" />
+							<div id="suggesstion-mob"></div>
+							</div>
+							</td><td width="50px"><div id="div_cmob"></div></td></tr>';
+						else
+							print '<tr><td colspan="4"><input type="hidden" name="mob" id="mob" value="0" /></td><td width="50px"></td></tr>';
+						if($systemid==1 || $systemid==4 || $systemid==10 || $systemid==15)
+							print '<tr><td width="50px"></td><td style="font-size:12pt">Salesman</td><td colspan="2">
+							<div class="frmSearch">
+							<input type="text" id="search-sm" autocomplete="nope" />
+							<div id="suggesstion-sm"></div>
+							</div>
+							</td><td width="50px"><div id="div_sm"></div></td></tr>';
+						else print '<tr><td colspan="5"><input type="hidden" id="search-sm" name="bill_sm" /></td></tr>';
+					?>
+					<tr>
+						<td width="50px"></td><td style="font-size:12pt"></td><td colspan="2">
+						<table>
+						<tr><td>
+							<div id="div_submit"><input type="button" value="Submit" onclick="createTMPBill()" style="width:100px; height:50px;" /></div>
+						</td><td>
+							<?php if(!isset($_GET['cust'])){
+								if($_COOKIE['retail']==0){ ?><input type="button" value="Create Cust" onclick="BMCreateCust('wholesale_cust')"  style="width:100px; height:50px;" /> <?php }
+								if($_COOKIE['retail']==1){ ?><input type="button" value="Create Cust" onclick="BMCreateCust('onetime_cust')" style="width:100px; height:50px;" /> <?php }
+							} ?>
+						</td></tr>
+						</table>
+						<br /><br /></td><td width="50px"></td>
+					</tr>
+				</table>
+			<?php }?>
+		</td>
+		<td width="20px"></td>
+		<td valign="top">
+			<div style="background-color:#EEEEEF; border-radius: 5px; padding-left:10px; padding-right:10px; width:250px">
+				<br />
+				<table align="center" height="100%">
+					<tr>
+						<td style="font-size:12pt;">
+							<form id="searchinv" action="index.php?components=bill2&action=search_bill&s=<?php print $bill_salesman; ?>&cust_odr=<?php print $_GET['cust_odr']; ?>" method="post" onsubmit="removeLeadingZeros()">
+								<input type="text" style="width:100px" name="search1" id="search1" placeholder="Invoice Number" />
+								<input type="Submit" value="Search" />
+							</form>
+						</td>
+					</tr>
+					<tr>
+						<td style="font-size:12pt;">
+							<form action="index.php"><input type="hidden" name="components" value="bill2" /><input type="hidden"
+									name="action" value="home" /><input type="hidden" name="s"
+									value="<?php print $bill_salesman; ?>" /><input type="hidden" name="cust_odr"
+									value="<?php print $_GET['cust_odr']; ?>" /><input type="text" style="width:100px"
+									name="searchcustid" placeholder="Customer ID"
+									value="<?php if(isset($_GET['searchcustid']))print $_GET['searchcustid']; ?>"
+									onclick="this.value=''" /><input type="Submit" value="Search" />
+							</form>
+						</td>
+					</tr>
+					<tr>
+						<td style="font-size:12pt;">
+							<form action="index.php"><input type="hidden" name="components" value="bill2" /><input type="hidden"
+									name="action" value="home" /><input type="hidden" name="s"
+									value="<?php print $bill_salesman; ?>" /><input type="hidden" name="cust_odr"
+									value="<?php print $_GET['cust_odr']; ?>" /><input type="text" style="width:100px"
+									name="searchcustname" placeholder="Customer Name"
+									value="<?php if(isset($_GET['searchcustname']))print $_GET['searchcustname']; ?>"
+									onclick="this.value=''" /><input type="Submit" value="Search" />
+							</form>
+						</td>
+					</tr>
+					<tr>
+						<td style="font-size:12pt;">
+							<form action="index.php"><input type="hidden" name="components" value="bill2" /><input type="hidden"
+									name="action" value="home" /><input type="hidden" name="s"
+									value="<?php print $bill_salesman; ?>" /><input type="hidden" name="cust_odr"
+									value="<?php print $_GET['cust_odr']; ?>" /><input type="text" style="width:100px" name="searchmob"
+									placeholder="Mobile Number" value="<?php if(isset($_GET['searchmob']))print $_GET['searchmob']; ?>"
+									onclick="this.value=''" /><input type="Submit" value="Search" />
+							</form>
+						</td>
+					</tr>
+					<tr>
+						<td style="font-size:12pt;">
+							<form action="index.php"><input type="hidden" name="components" value="bill2" /><input type="hidden"
+									name="action" value="home" /><input type="hidden" name="s"
+									value="<?php print $bill_salesman; ?>" /><input type="hidden" name="cust_odr"
+									value="<?php print $_GET['cust_odr']; ?>" /><input type="text" style="width:100px"
+									name="searchunic" placeholder="Unique ID"
+									value="<?php if(isset($_GET['searchunic']))print $_GET['searchunic']; ?>"
+									onclick="this.value=''" /><input type="Submit" value="Search" />
+							</form>
+						</td>
+					</tr>
+				</table>
+				<br />
+			</div>
+			<?php
+				if(isset($_GET['searchcustid'])){
+					print '<iframe id="search_frm" width="260px" height="350px" src="components/bill2/view/tpl/search_bill.php?searchcustid='.$_GET['searchcustid'].'"></iframe>';
+				}elseif(isset($_GET['searchcustname'])){
+					print '<iframe id="search_frm" width="260px" height="350px" src="components/bill2/view/tpl/search_bill.php?searchcustname='.$_GET['searchcustname'].'"></iframe>';
+				}elseif(isset($_GET['searchmob'])){
+					print '<iframe id="search_frm" width="260px" height="350px" src="components/bill2/view/tpl/search_bill.php?searchmob='.$_GET['searchmob'].'"></iframe>';
+				}elseif(isset($_GET['searchunic'])){
+					print '<iframe id="search_frm" width="260px" height="350px" src="components/bill2/view/tpl/search_bill.php?searchunic='.$_GET['searchunic'].'"></iframe>';
+				}
+			?>
+		</td>
+	</tr>
+</table>
+
+<?php
+if($current_district==''){
+	if($static_district!=0) print '<script type="text/javascript"> document.getElementById("district").value='.$static_district.'; setDistrict2("bill2"); </script>';
+}
+
+	include_once  'template/footer.php';
+?>

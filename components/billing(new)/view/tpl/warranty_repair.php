@@ -1,0 +1,8 @@
+	<input type="hidden" id="id" value="<?php print $_GET['id']; ?>" />
+	<br /><br />
+	<table border="0" style="font-size:10pt" align="center"><tr height="180px">
+	<td width="150px" bgcolor="#93DBB7" align="center"><input type="text" style="width:115px; text-align:center" value="free" disabled="disabled" /><br /><br /><input type="button" value="Warranty Repair" onclick="setWarrantyRepair(0,3,1)" style="height:100px; width:120px; border-radius: 5px; color:white; background-color: rgb(6, 150, 0); cursor:pointer; border: 5px solid rgba(0, 0, 0, 0.0980392);" /></td>
+	<td width="150px" bgcolor="#C5A8FF" align="center"><input type="text" style="width:115px; text-align:center" value="" placeholder="Amount" id="amo" /><br /><br /><input type="button" value="Paid Repair" onclick="setWarrantyRepair(0,3,2)" style="height:100px; width:120px; border-radius: 5px; color:white; background-color:#A400A4; cursor:pointer; border: 5px solid purple;" /></td>
+	<td width="150px" bgcolor="#FF9393" align="center"><input type="text" style="width:115px; text-align:center"  value="N/A" disabled="disabled" /><br /><br /><input type="button" value="Repair Reject" onclick="setWarrantyRepair(3,0,3)" style="height:100px; width:120px; border-radius: 5px; color:white; background-color:#C60040; cursor:pointer; border: 5px solid maroon;" /></td>
+	</tr></table>
+	<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />

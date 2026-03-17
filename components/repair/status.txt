@@ -1,0 +1,8 @@
+0=deleted
+1=pending
+2=seen
+3=picked
+4=repaired
+5=repaired Collected
+6=rejected
+7=rejected Collected

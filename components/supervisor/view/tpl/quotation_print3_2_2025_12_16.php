@@ -1,0 +1,437 @@
+<?php
+include_once '../../modle/supervisorModule.php';
+include_once '../../../../template/common.php';
+generateQuot(1);
+$logo = getStoreLogo(2);
+$bill_module = bill_module(2);
+$decimal = getDecimalPlaces(2);
+$action = $_GET['action'];
+$components = $_GET['sub_components'];
+$currency = getCurrency(2);
+$sub_system = $_COOKIE['sub_system'];
+if ($_GET['action'] == 'qo_com_inv') {
+	$q_title = 'INVOICE';
+	$q_number = 'Invoice No';
+	$q_inv_code = '';
+	$page_height = 690;
+} else {
+	$q_title = 'QUOTATION';
+	$q_number = 'Quotation No';
+	$q_inv_code = 'QTN';
+	if ($systemid == 13 && $sub_system == 1)
+		$q_inv_code = 'QEX';
+	if ($qo_note == '') {
+		$page_height = 570;
+	} else {
+		$note_len = strlen($qo_note);
+		if ($logo === '13_3')
+			$page_height = 550 - (round($note_len / 88) * 20);
+		else
+			$page_height = 570 - (round($note_len / 88) * 20);
+	}
+}
+$show_excluded = isset($_GET['show_excluded']) ? intval($_GET['show_excluded']) : 0;
+?>
+<input type="hidden" id="item_count" value="<?php print sizeof($qi_item_des); ?>" />
+
+<?php if (($systemid == 13 && $sub_system == 0) || ($systemid != 13)) { ?>
+	<table width="100%">
+		<tr>
+			<td rowspan="2" style="font-family:Calibri; font-size:11pt; vertical-align:top">
+				<img src="../../../../images/cplogo<?php print $logo; ?>.png" height="<?php if ($logo === '13_3')
+						 echo "100px;";
+					 else
+						 echo "33px;"; ?>" />
+				<table style="font-size:12pt;" cellspacing="0">
+					<tr>
+						<td>Tel </td>
+						<td>: <?php print $qo_st_tel; ?></td>
+					</tr>
+					<tr>
+						<td>Email </td>
+						<td>: <?php print $email; ?></td>
+					</tr>
+					<tr>
+						<td>Web </td>
+						<td>: <?php print $web; ?></td>
+					</tr>
+					<?php if ($trn_no != '') { ?>
+						<tr>
+							<td><?php if ($systemid == 13)
+								print 'VAT Reg. No. ';
+							else
+								print 'TRN No '; ?></td>
+							<td>: <?php print $trn_no; ?></td>
+						</tr>
+					<?php } ?>
+				</table>
+				<br />
+				<table width="100%" style="font-family:Calibri; font-size:12pt; margin-top: -10px;" cellspacing="0">
+					<tr>
+						<td width="50px"><?php print $qo_att; ?></td>
+					</tr>
+					<tr>
+						<td width="50px">
+							<?php
+							if (($components != 'to')) {
+								print '<a href="../../../../index.php?components=' . $bill_module . '&action=cust_details&id=' . $qo_cust_id . '&action2=qo_finish&id2=' . $_GET['id'] . '" target="_parent" title="' . $cu_details . '" style="text-decoration:none; color:black" >' . ucfirst($qo_cust_name) . '</a>
+								,<br />' . $qo_cust_address;
+								if (!empty($qo_comment)) {
+									print '<div style="text-decoration:none; color:black; margin-top:2px; display:block; border: 1px solid #ccc; padding: 2px 5px; width: max-content; max-width: 400px;">' . $qo_comment . '</div>';
+								}
+							} else {
+								print '<span style="text-decoration:none; color:black">' . ucfirst($qo_cust_name) . '</span>
+								<br />' . $qo_cust_address;
+							}
+							?>
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td></td>
+			<td align="right">
+				<br /><br />
+				<span style="font-family:'Arial Black'; font-size:20pt"><?php print $q_title; ?></span><br />
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td align="right"
+				style="font-family:Calibri; font-size:12pt; <?php (!empty($qo_comment)) ? print '' : print 'padding-top: 47px;'; ?>">
+				<table cellspacing="">
+					<tr>
+						<td>Date</td>
+						<td> : </td>
+						<td align="right"><?php print $qo_date; ?></td>
+					</tr>
+					<tr>
+						<td><?php print $q_number; ?></td>
+						<td> : </td>
+						<td align="right">
+							<?php print $q_inv_code . str_pad($quot_no, 7, "0", STR_PAD_LEFT);
+							if ($qo_v > 1)
+								print 'R' . ($qo_v - 1); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>Created By</td>
+						<td> : </td>
+						<td align="right"><?php print ucfirst($qo_salesman); ?></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+<?php } ?>
+
+<?php if (($systemid == 13) && ($sub_system == 1)) { ?>
+	<!-- New Right Side Logo Header -->
+	<table width="100%" border="0" style="font-family:Calibri; font-size:12pt;">
+		<tr>
+			<td>
+				<table style="font-family:Calibri; font-size:12pt;" cellspacing="0">
+					<tr>
+						<td colspan="2">
+							<span style="font-family:'Arial Black'; font-size:20pt"><?php print $q_title; ?></span>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Tel </td>
+						<td>: <?php print $qo_st_tel; ?></td>
+					</tr>
+					<tr>
+						<td>Email </td>
+						<td>: <?php print $email; ?></td>
+					</tr>
+					<tr>
+						<td>Web </td>
+						<td>: <?php print $web; ?></td>
+					</tr>
+					<?php if ($trn_no != '') { ?>
+						<tr>
+							<td>VAT Reg. No. </td>
+							<td>: <?php print $trn_no; ?></td>
+						</tr>
+					<?php } ?>
+				</table>
+			</td>
+			<td></td>
+			<td align="right">
+				<img style="margin-top: -25px;" src="../../../../images/cplogo<?php print $logo; ?>.png" height="<?php if ($logo === '13_3')
+						 echo "150px;";
+					 else
+						 echo "33px;"; ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<?php
+				if (($components != 'to')) {
+					print '<a href="../../../../index.php?components=' . $bill_module . '&action=cust_details&id=' . $qo_cust_id . '&action2=qo_finish&id2=' . $_GET['id'] . '" target="_parent" title="' . $cu_details . '" style="text-decoration:none; color:black" >' . ucfirst($qo_cust_name) . '</a>,
+					<br />' . $qo_cust_address;
+					if (!empty($qo_comment)) {
+						print '<div style="text-decoration:none; color:black; margin-top:2px; display:block; border: 1px solid #ccc; padding: 2px 5px; width: max-content; max-width: 400px">' . $qo_comment . '</div>';
+					}
+				} else {
+					print '<span style="text-decoration:none; color:black">' . ucfirst($qo_cust_name) . '</span><br />' . $qo_cust_address;
+				}
+
+				?>
+			</td>
+			<td align="right" colspan="2" style="font-family:Calibri; font-size:11pt">
+				<table cellspacing="0" border="0">
+					<tr>
+						<td width="50px"></td>
+						<td colspan="1">Date</td>
+						<td> : </td>
+						<td align="right"><?php print $qo_date; ?></td>
+					</tr>
+					<tr>
+						<td width="50px"></td>
+						<td><?php print $q_number; ?></td>
+						<td> : </td>
+						<td align="right">
+							<?php print $q_inv_code . str_pad($quot_no, 7, "0", STR_PAD_LEFT);
+							if ($qo_v > 1)
+								print 'R' . ($qo_v - 1); ?>
+						</td>
+					</tr>
+					<tr>
+						<td width="50px"></td>
+						<td>Created By</td>
+						<td> : </td>
+						<td align="right"><?php print ucfirst($qo_salesman); ?></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+<?php } ?>
+
+<table width="100%" style="font-family:Arial; font-size:11pt" cellspacing="0">
+	<tr>
+		<td align="center" style="font-weight:bold; text-decoration:underline"><?php print $qo_heading; ?></td>
+	</tr>
+</table>
+
+<br />
+
+<table align="center" height="<?php print $page_height; ?>px" width="100%" border="1" cellspacing="0" border="1">
+	<tr
+		style="font-family:Arial; font-size:10pt; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+		<th width="30px">#</th>
+		<th height="20px">DESCRIPTION</th>
+		<th width="60px">QTY</th>
+		<?php if (($components != 'to')) { ?>
+			<th width="80px">UNIT PRICE (<?php print rtrim($currency, "."); ?>)</th>
+			<th width="100px">TOTAL <br />(<?php print rtrim($currency, "."); ?>)</th>
+		<?php } ?>
+	</tr>
+	<?php
+	$total_discount = $payable = $sub_total = 0;
+	for ($i = 0; $i < sizeof($qi_item_des); $i++) {
+		print
+			'<tr style="font-size:10pt; vertical-align:top" height="20px">
+					<td align="center" style="border-bottom:0; border-top:0;">
+						<div id="id_' . $i . '" style="padding: 2px 5px;">' . ($i + 1) . '</div>
+					</td>
+					<td style="border-bottom:0; border-top:0;">
+						<div id="des_' . $i . '" style="padding: 2px 5px;">' . $qi_item_des[$i] . '<br />' . $qi_item_code[$i] . '</div>
+						<div id="comm_' . $i . '" style="padding: 2px 5px;">';
+		if ($qi_comment[$i] != '')
+			print '<span style="font-family:Calibri; font-weight:900;">' . html_entity_decode($qi_comment[$i]) . '</span>';
+		print '</div>
+					<br />
+					</td>
+					<td style="border-bottom:0; border-top:0;" align="right">
+						<div id="qty_' . $i . '" style="padding: 2px 5px;">' . number_format($qi_qty[$i]) . '&nbsp;' . $qi_item_unit_type[$i] . '</div>
+					</td>';
+		if (($components != 'to')) {
+			if ($show_excluded) {
+				$unit_price = ($qi_uprice[$i] / ($tax + 100)) * 100;
+			} else {
+				$unit_price = $qi_uprice[$i];
+			}
+			$line_total = $qi_qty[$i] * $unit_price;  // tax-excluded line total
+			print '<td width="50px" style="border-bottom:0; border-top:0;" align="right">
+								<div id="uprice_' . $i . '" style="padding: 2px 5px;">' . number_format($unit_price, $decimal) . '</div>
+								</td>
+								<td align="right" style="border-bottom:0; border-top:0;">
+									<div id="tprice_' . $i . '" style="padding: 2px 5px;">' . number_format($line_total, $decimal) . '</div>
+							</td>';
+		}
+		print '</tr>';
+		$total_discount += $qi_qty[$i] * $qi_discount[$i];
+		$sub_total += $line_total;
+	}
+
+	if ($show_excluded) {
+		$total_ex_vat = $sub_total - $qo_discount;
+		$vat_amount = ($sub_total / 100) * $tax;
+		$payable = $total_ex_vat + $vat_amount;
+	} else {
+		$vat_amount = $tax_added_value;
+		$sub_total = $total;
+		$payable = $sub_total - $qo_discount;
+		$total_ex_vat = $payable - $vat_amount;
+	}
+
+	if ($qo_image == 1) {
+		print '<tr style="font-size:10pt">
+					<td style="border-bottom:0; border-top:0;"></td>
+					<td style="border-bottom:0; border-top:0;" align="center">
+						<img style="height:' . $qo_image_hei . 'px" src="../../../../images/customerdata/' . $systemid . '/quotation/' . str_pad($_GET['id'], 10, "0", STR_PAD_LEFT) . '.jpg" /></td>
+					<td style="border-bottom:0; border-top:0;"></td>
+					<td width="50px" style="border-bottom:0; border-top:0;"></td>
+					<td align="right" style="border-bottom:0; border-top:0;"></td>
+				</tr>';
+	} else {
+		print '<tr style="font-size:10pt">
+					<td style="border-bottom:0; border-top:0;"></td>
+					<td style="border-bottom:0; border-top:0;"></td>
+					<td style="border-bottom:0; border-top:0;"></td>';
+		if (($components != 'to')) {
+			print '<td width="50px" style="border-bottom:0; border-top:0;"></td>
+						<td align="right" style="border-bottom:0; border-top:0;"></td>';
+		}
+		print '</tr>';
+	}
+	if (($components != 'to')) {
+		// Sub Total
+		print '<tr style="font-family:Arial; font-size:10pt; font-weight:600; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+				<td colspan="4" align="right" height="20px" style="padding-right:5px; border-right:1; border-bottom:0; border-top:0;">Sub Total &nbsp;&nbsp; ' . $currency . ' </td>
+				<td align="right" style="border-bottom:0;">
+					<div id="total">' . number_format(($sub_total), $decimal) . '&nbsp;&nbsp;</div>
+				</td>
+            </tr>';
+
+		// Discount
+		if ($qo_discount > 0) {
+			print '<tr
+				    style="font-family:Arial; font-size:10pt; font-weight:600; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+				    <td colspan="4" align="right" height="20px" style="padding-right:5px; border-right:1; border-bottom:0; border-top:0;">Discount
+				        ' . round(((($qo_discount) * 100) / ($sub_total - $total_discount)), 2) . '% &nbsp;&nbsp; ' . $currency . ' </td>
+				    <td align="right" style="border-bottom:0;">' . number_format($qo_discount, $decimal) . '&nbsp;&nbsp;</td>
+				</tr>';
+		}
+
+		// vat
+		if (($tax != '') && ($tax != 0)) {
+			print '<tr style="font-family:Arial; font-size:10pt; font-weight:600; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+			<td colspan="4" align="right" height="20px" style="padding-right:5px; border-right:1; border-bottom:0; border-top:0;">VAT ' . $tax . '% &nbsp;&nbsp; ' . $currency . ' </td>
+			<td align="right" style="border-bottom:0;">' . number_format($vat_amount, $decimal) . '&nbsp;&nbsp;</td>
+			</tr>';
+		}
+
+		// Payable amount Including VAT
+		print '<tr style="font-family:Arial; font-size:10pt; font-weight:600; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+				<td colspan="4" align="right" height="20px" style="padding-right:5px; border-right:1; border-bottom:0; border-top:0;">
+					Payable Amount Including VAT &nbsp;&nbsp; ' . $currency . '
+				</td>
+				<td align="right" style="border-bottom:0;">' . number_format((($payable)), $decimal) . '&nbsp;&nbsp;</td>
+			</tr>';
+
+		// Total Amount Excluding VAT
+		print '<tr style="font-family:Arial; font-size:10pt; font-weight:600; color:white; background-color:black; -webkit-print-color-adjust: exact;">
+					<td colspan="4" align="right" height="20px" style="padding-right:5px; border-right:1; border-bottom:0; border-top:0;">Total Amount Excluding VAT &nbsp;&nbsp; ' . $currency . ' </td>
+					<td align="right" style="border-bottom:0;">
+						<div id="total">' . number_format(($total_ex_vat), $decimal) . '&nbsp;&nbsp;</div>
+					</td>
+				</tr>';
+	}
+
+	?>
+</table>
+
+<br /><br />
+
+<table cellspacing="0" style="font-size:11pt; font-family:Calibri">
+	<?php
+	function convertMonthsToYearsMonths($qo_warranty)
+	{
+		$qo_warranty = (int) $qo_warranty;
+		if ($qo_warranty <= 0) {
+			return "Invalid input";
+		}
+
+		if ($qo_warranty < 12) {
+			// Use == for months just to be consistent
+			return $qo_warranty . ($qo_warranty == 1 ? ' Month' : ' Months');
+		}
+
+		$years = floor($qo_warranty / 12); // This gives float(1)
+		$remainingMonths = $qo_warranty % 12;
+
+		// Use == to compare float(1) with int(1). This will be TRUE.
+		$yearString = $years . ($years == 1 ? ' Year' : ' Years');
+
+		if ($remainingMonths > 0) {
+			// Use == for months as well
+			$monthString =
+				$remainingMonths .
+				($remainingMonths == 1 ? ' Month' : ' Months');
+			return "$yearString & $monthString";
+		} else {
+			return $yearString;
+		}
+	}
+
+	if ($qo_warranty != '0')
+		print '<tr>
+				<td style="vertical-align:top" width="120px"><span><strong>Warranty</span></strong></td>
+				<td>' . convertMonthsToYearsMonths($qo_warranty) . ' Warranty</td>
+			</tr>';
+	?>
+	<tr>
+		<td colspan="2" height="3px"></td>
+	</tr>
+	<?php if ($action == 'qo_finish') { ?>
+		<tr>
+			<td style="vertical-align:top" width="120px"><strong><span>Payment Terms</span></strong></td>
+			<td><?php print $qo_terms; ?></td>
+		</tr>
+		<tr>
+			<td colspan="2" height="3px"></td>
+		</tr>
+		<tr>
+			<td style="vertical-align:top" width="120px"><strong><span>Validity</span></strong></td>
+			<td>This Quotation is valid for <strong><?php print $qo_validity; ?></strong> days only</td>
+		</tr>
+		<tr>
+			<td colspan="2" height="3px"></td>
+		</tr>
+		<?php
+		if ($qo_leadtime != '') {
+			if ($systemid == 13 && $sub_system == 1)
+				$lead_time_text = 'Project Duration';
+			else
+				$lead_time_text = 'Lead Time';
+			print '<tr>
+							<td style="vertical-align:top" width="120px"><strong><span>' . $lead_time_text . '</span></strong></td>
+							<td>' . $qo_leadtime . '</td>
+						</tr>';
+		}
+		?>
+		<tr>
+			<td colspan="2" height="3px"></td>
+		</tr>
+		<?php if ($qo_note != '')
+			print '<tr>
+						<td style="vertical-align:top" width="120px"><strong><span>Note</span></strong></td>
+						<td>' . html_entity_decode($qo_note) . '</td>
+					</tr>';
+		?>
+	<?php } ?>
+</table>
+
+<br />
+
+<table align="center" width="100%" border="0" cellspacing="0" style="font-family:Arial; font-size:9pt">
+	<tr>
+		<td height="3px" bgcolor="black" style="-webkit-print-color-adjust: exact;"></td>
+	</tr>
+	<tr>
+		<td align="center"><?php print $qo_st_name . ', ' . str_replace(",<br />", ", ", $qo_st_add); ?></td>
+	</tr>
+</table>
