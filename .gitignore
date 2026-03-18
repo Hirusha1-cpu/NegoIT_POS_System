@@ -12,6 +12,7 @@ logfile.log
 .env
 .env.local
 config.local.php
+config.production.php
 
 
 # Cache files

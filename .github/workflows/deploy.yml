@@ -1,0 +1,31 @@
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches: [ "main" ]  # Triggers when you push to main branch
+
+jobs:
+  ftp-deploy:
+    name: 🚀 Deploy via FTP
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📤 FTP Upload
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ftpupload.net
+          username: if0_41411582
+          password: ${{ secrets.INFINITYFREE_FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /htdocs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github*
+            README.md
+            **/config.local.php
+            **/negoit.sql
+            **/.DS_Store
