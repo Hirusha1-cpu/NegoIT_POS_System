@@ -13,6 +13,7 @@ logfile.log
 .env.local
 config.local.php
 
+
 # Cache files
 /cache
 /tmp

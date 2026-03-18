@@ -293,4 +293,13 @@ switch ($_SERVER['SERVER_NAME']) {
 			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		}
 		break;
+
+	//---------------------------------InfinityFree (NegoIT POS)--------------------------------//
+	case "negoitpos.wuaze.com":
+    	$conn = mysqli_connect('sql211.infinityfree.com', 'if0_41411582', 'PWGE8UL94pm9JzC', 'if0_41411582_negoit_db');
+    	$conn2 = mysqli_connect('sql211.infinityfree.com', 'if0_41411582', 'PWGE8UL94pm9JzC', 'if0_41411582_negoit_db');
+    	if (mysqli_connect_errno()) {
+       	 echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    	}
+    	break;		
 }
