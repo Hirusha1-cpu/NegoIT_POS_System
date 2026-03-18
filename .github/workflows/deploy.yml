@@ -13,15 +13,22 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
+      - name: 🔍 Debug FTP Connection
+        run: |
+          echo "Testing FTP connection..."
+          echo "Server: ftpupload.net"
+          echo "Username: if0_41411582"
+          echo "Password length: ${{ secrets.INFINITYFREE_FTP_PASSWORD != '' && '✓ Set' || '✗ Not set' }}"
+      
       - name: 📤 FTP Upload
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ftpupload.net
           username: if0_41411582
           password: ${{ secrets.INFINITYFREE_FTP_PASSWORD }}
-          local-dir: ./
           server-dir: /htdocs/
-          dangerous-clean-slate: true  # This deletes files on server that aren't in your repo
+          local-dir: ./
+          dangerous-clean-slate: true
           exclude: |
             **/.git*
             **/.git*/**
@@ -30,3 +37,5 @@ jobs:
             **/config.local.php
             **/negoit.sql
             **/.DS_Store
+            **/info.php
+            **/test_db.php
