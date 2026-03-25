@@ -107,7 +107,8 @@
 			<th class="shipmentTB4">Total Paid Amount</th>
 		</tr>
 		<?php
-			for($i=0;$i<sizeof($del_uid);$i++){ if($i%2==0) $color1='#F9F9F9' ; else $color1='#EEEEEE' ;
+			// for($i=0;$i<sizeof($del_uid);$i++){ if($i%2==0) $color1='#F9F9F9' ; else $color1='#EEEEEE' ;
+			for($i = 0; $i < sizeof($del_uid ?? []); $i++){ if($i%2==0) $color1='#F9F9F9' ; else $color1='#EEEEEE' ;
 				print '<tr style="background-color:' .$color1.'">
 				<td>
 					&nbsp;&nbsp;

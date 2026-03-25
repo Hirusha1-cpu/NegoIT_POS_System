@@ -4,7 +4,7 @@ function getOrder($method)
 {
 	global $bi_invoice_no, $bi_cust, $bi_district, $bi_billed_by, $bi_billed_date, $bi_billed_time, $bi_seen_by, $bi_seen_date,
 	$bi_seen_time, $bi_packed_by, $bi_packed_date, $bi_packed_time, $bi_shipped_by, $bi_shipped_date, $bi_shipped_time,
-	$bi_deliverd_by, $bi_deliverd_date, $bi_deliverd_time, $menu_by, $menu_date, $type, $bi_status, $bi_type, $bm_store, $month_filter, $bi_item_desc, $bi_item_qty, $bi_rt_item_desc, $bi_rt_item_qty, $bi_item_id, $bi_rt_item_id;
+	$bi_deliverd_by, $bi_deliverd_date, $bi_deliverd_time, $menu_by, $menu_date, $type, $bi_status, $bi_type, $bm_store, $month_filter, $bi_item_desc, $bi_item_qty, $bi_rt_item_desc, $bi_rt_item_qty, $bi_item_id, $bi_rt_item_id, $conn2;
 	;
 
 	$bi_item_desc = $bi_item_qty = $bi_rt_item_desc = $bi_rt_item_qty = $bi_item_desc = $bi_item_qty = $bi_rt_item_desc = $bi_rt_item_qty = $bi_item_id = $bi_rt_item_id = array();
@@ -3726,7 +3726,7 @@ function sms3($invoice_no)
 //--------------------------------Return-----------------------------------//
 function getReturn()
 {
-	global $rt_item, $rt_itmdesc, $rt_qty, $rt_unic;
+	global $rt_item, $rt_itmdesc, $rt_qty, $rt_unic, $conn;
 	$store = $_COOKIE['store'];
 	$rt_item = array();
 	include('config.php');
@@ -4124,7 +4124,7 @@ function moveCustOdr()
 
 function getStore()
 {
-	global $store_id, $store_name;
+	global $store_id, $store_name, $conn2;
 	include('config.php');
 	$query = "SELECT id,name FROM stores WHERE `status`='1'";
 	$result = mysqli_query($conn2, $query);

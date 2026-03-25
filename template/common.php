@@ -447,80 +447,170 @@ function moreSm($sub_system)
 }
 
 // update by nirmal 18_10_2023
-function listItem($sub_system)
+// function listItema($sub_system)
+// {
+// 	global $data_list, $fn, $conn2;
+// 	$data_list = array();
+
+// 	if ($_POST['keyword']) {
+// 		$keyword = str_replace("'", "", $_POST['keyword']);
+// 		$item_filter = $_GET['item_filter'];
+// 		$item_type = $_GET['item_type'];
+// 		$components = $_REQUEST['components'];
+// 		$inf_systemid = inf_systemid(1);
+
+// 		if ($_GET['action'] == 'code-list') {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				$qry = "ii.`code` LIKE '%$keyword%'";
+// 			else
+// 				$qry = "`code` LIKE '%$keyword%'";
+// 			$fn = 'selectCode';
+// 		}
+// 		if ($_GET['action'] == 'desc-list') {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				$qry = "ii.`description` LIKE '%$keyword%'";
+// 			else
+// 				$qry = "`description` LIKE '%$keyword%'";
+// 			$fn = 'selectDesc';
+// 		}
+
+// 		if ($item_filter == '') {
+// 			$item_filter_qry = '';
+// 		}
+// 		if ($item_filter == 1) {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				$item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
+// 			else
+// 				$item_filter_qry = "AND pr_sr IN (1,2)";
+// 		}
+// 		if ($item_filter == 2) {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				$item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
+// 			else
+// 				$item_filter_qry = "AND pr_sr IN (1,2)";
+// 		}
+// 		if ($item_filter == 3) {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				$item_filter_qry = "AND ii.`pr_sr`='3'";
+// 			else
+// 				$item_filter_qry = "AND pr_sr='3'";
+// 		}
+
+// 		if ($item_type == 'all') {
+// 			$item_type_qry = "";
+// 		} else {
+// 			if (($inf_systemid == 13) && ($components == 'bill2'))
+// 				"AND ii.`unic`='$item_type'";
+// 			else
+// 				$item_type_qry = "AND `unic`='$item_type'";
+// 		}
+
+// 		include('config.php');
+// 		if ($inf_systemid == 1 || $inf_systemid == 17 || $inf_systemid == 24) {
+// 			$query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+// 		} else if (($inf_systemid == 13) && ($components == 'bill2')) {
+// 			$query = "SELECT DISTINCT ii.`code`, ii.`description` FROM inventory_items ii, item_category ic WHERE ii.`category` = ic.`id` AND ii.`sub_system`='$sub_system' AND ii.`status`='1' AND ic.`status` != '0' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+// 		} else {
+// 			$query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `sub_system`='$sub_system' AND `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+// 		}
+// 		error_log("  Qry " . $query);
+// 		$result = mysqli_query($conn2, $query);
+// 		if (!$result) {
+// 			error_log("SQL ERROR: " . mysqli_error($conn2));
+// 		} else {
+// 			error_log("ROWS: " . mysqli_num_rows($result));
+// 		}
+// 		while ($row = mysqli_fetch_array($result)) {
+// 			if ($_GET['action'] == 'code-list')
+// 				$data_list[] = $row[0];
+// 			if ($_GET['action'] == 'desc-list')
+// 				$data_list[] = $row[1];
+// 		}
+// 	}
+// }
+function listItema($sub_system)
 {
-	global $data_list, $fn;
-	$data_list = array();
+    global $data_list, $fn, $conn2;
+    $data_list = array();
 
-	if ($_POST['keyword']) {
-		$keyword = str_replace("'", "", $_POST['keyword']);
-		$item_filter = $_GET['item_filter'];
-		$item_type = $_GET['item_type'];
-		$components = $_REQUEST['components'];
-		$inf_systemid = inf_systemid(1);
+    if ($_POST['keyword']) {
+        $keyword = str_replace("'", "", $_POST['keyword']);
+        $item_filter = $_GET['item_filter'];
+        $item_type = $_GET['item_type'];
+        $components = $_REQUEST['components'];
+        $inf_systemid = inf_systemid(1);
 
-		if ($_GET['action'] == 'code-list') {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				$qry = "ii.`code` LIKE '%$keyword%'";
-			else
-				$qry = "`code` LIKE '%$keyword%'";
-			$fn = 'selectCode';
-		}
-		if ($_GET['action'] == 'desc-list') {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				$qry = "ii.`description` LIKE '%$keyword%'";
-			else
-				$qry = "`description` LIKE '%$keyword%'";
-			$fn = 'selectDesc';
-		}
+        if ($_GET['action'] == 'code-list') {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $qry = "ii.`code` LIKE '%$keyword%'";
+            else
+                $qry = "`code` LIKE '%$keyword%'";
+            $fn = 'selectCode';
+        }
+        if ($_GET['action'] == 'desc-list') {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $qry = "ii.`description` LIKE '%$keyword%'";
+            else
+                $qry = "`description` LIKE '%$keyword%'";
+            $fn = 'selectDesc';
+        }
 
-		if ($item_filter == '') {
-			$item_filter_qry = '';
-		}
-		if ($item_filter == 1) {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				$item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
-			else
-				$item_filter_qry = "AND pr_sr IN (1,2)";
-		}
-		if ($item_filter == 2) {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				$item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
-			else
-				$item_filter_qry = "AND pr_sr IN (1,2)";
-		}
-		if ($item_filter == 3) {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				$item_filter_qry = "AND ii.`pr_sr`='3'";
-			else
-				$item_filter_qry = "AND pr_sr='3'";
-		}
+        if ($item_filter == '') {
+            $item_filter_qry = '';
+        }
+        if ($item_filter == 1) {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
+            else
+                $item_filter_qry = "AND pr_sr IN (1,2)";
+        }
+        if ($item_filter == 2) {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $item_filter_qry = "AND ii.`pr_sr` IN (1,2)";
+            else
+                $item_filter_qry = "AND pr_sr IN (1,2)";
+        }
+        if ($item_filter == 3) {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $item_filter_qry = "AND ii.`pr_sr`='3'";
+            else
+                $item_filter_qry = "AND pr_sr='3'";
+        }
 
-		if ($item_type == 'all') {
-			$item_type_qry = "";
-		} else {
-			if (($inf_systemid == 13) && ($components == 'bill2'))
-				"AND ii.`unic`='$item_type'";
-			else
-				$item_type_qry = "AND `unic`='$item_type'";
-		}
+        if ($item_type == 'all') {
+            $item_type_qry = "";
+        } else {
+            if (($inf_systemid == 13) && ($components == 'bill2'))
+                $item_type_qry = "AND ii.`unic`='$item_type'";  // FIXED: Added $item_type_qry =
+            else
+                $item_type_qry = "AND `unic`='$item_type'";
+        }
 
-		include('config.php');
-		if ($inf_systemid == 1 || $inf_systemid == 17 || $inf_systemid == 24) {
-			$query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
-		} else if (($inf_systemid == 13) && ($components == 'bill2')) {
-			$query = "SELECT DISTINCT ii.`code`, ii.`description` FROM inventory_items ii, item_category ic WHERE ii.`category` = ic.`id` AND ii.`sub_system`='$sub_system' AND ii.`status`='1' AND ic.`status` != '0' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
-		} else {
-			$query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `sub_system`='$sub_system' AND `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
-		}
-		$result = mysqli_query($conn2, $query);
-		while ($row = mysqli_fetch_array($result)) {
-			if ($_GET['action'] == 'code-list')
-				$data_list[] = $row[0];
-			if ($_GET['action'] == 'desc-list')
-				$data_list[] = $row[1];
-		}
-	}
+        include('config.php');
+        
+        if ($inf_systemid == 1 || $inf_systemid == 17 || $inf_systemid == 24) {
+            $query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+        } else if (($inf_systemid == 13) && ($components == 'bill2')) {
+            // FIXED: Removed the category status condition
+            $query = "SELECT DISTINCT ii.`code`, ii.`description` FROM inventory_items ii, item_category ic WHERE ii.`category` = ic.`id` AND ii.`sub_system`='$sub_system' AND ii.`status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+        } else {
+            $query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `sub_system`='$sub_system' AND `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
+        }
+        
+        error_log("  Qry " . $query);
+        $result = mysqli_query($conn2, $query);
+        if (!$result) {
+            error_log("SQL ERROR: " . mysqli_error($conn2));
+        } else {
+            error_log("ROWS: " . mysqli_num_rows($result));
+        }
+        while ($row = mysqli_fetch_array($result)) {
+            if ($_GET['action'] == 'code-list')
+                $data_list[] = $row[0];
+            if ($_GET['action'] == 'desc-list')
+                $data_list[] = $row[1];
+        }
+    }
 }
 
 function salesCommission()
@@ -1546,6 +1636,7 @@ function validateDate($dateString, $expectedFormat)
 // added by nirmal 13_09_2023
 function isDeletedMenuActive()
 {
+	global $conn2;
 	if (isset($_SESSION['deleted_menu_active'])) {
 		return $_SESSION['deleted_menu_active'];
 	} else {
@@ -1674,12 +1765,13 @@ function isCustomInvoiceNoActive($method)
 {
 	if (isset($_SESSION['is_custom_invoice_no_active'])) {
 		return $_SESSION['is_custom_invoice_no_active'];
-	} else {
-		if ($method == 1)
-			include('config.php');
-		if ($method == 2)
-			include('../../../../config.php');
-
+		} else {
+			if ($method == 1)
+				include('config.php');
+			if ($method == 2)
+				include('../../../../config.php');
+			
+			global $conn2;
 		$result = mysqli_query($conn2, "SELECT `value` FROM settings WHERE `setting`='custom_invoice_no_active'");
 		$row = mysqli_fetch_assoc($result);
 		if (!empty($row)) {
@@ -1698,6 +1790,7 @@ function isCustomInvoiceNoActive($method)
 // added by nirmal 23_12_2023
 function generateBillNumber($store_id, $type)
 {
+	global $conn2;
 	include('config.php');
 
 	$getStoreInfoQuery = "SELECT `invoice_prefix`, `invoice_start_number` FROM stores WHERE `id` = '$store_id'";
@@ -1744,6 +1837,7 @@ function generateBillNumber($store_id, $type)
 // added by nirmal 25_12_2023
 function emptyBillDelete($salesman, $module)
 {
+	global $conn2, $conn;
 	include('config.php');
 	if ($module == 'bill2') {
 		$result = mysqli_query($conn2, "SELECT `bm_no` FROM bill_main_tmp WHERE `billed_by` = '$salesman' ORDER BY `order_timestamp` DESC LIMIT 1");
@@ -4543,6 +4637,7 @@ function isTimeShow()
 
 function isOdrCrossCheckActive()
 {
+	global $conn2;
 	if (isset($_SESSION['is_odr_cross_check_active'])) {
 		return $_SESSION['is_odr_cross_check_active'];
 	} else {

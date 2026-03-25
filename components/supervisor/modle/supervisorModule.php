@@ -31,7 +31,7 @@ function getCustSup($sub_system)
 
 function getUnlockedBills()
 {
-	global $invoice_no, $billed_by, $billed_cust, $date, $time;
+	global $invoice_no, $billed_by, $billed_cust, $date, $time,$conn2;
 	$store = $_COOKIE['store'];
 	$invoice_no = array();
 	include('config.php');
@@ -1212,7 +1212,7 @@ function getCreditData($sub_system){
 // updated by nirmal 07_07_2025 (added specific_cust_id parameter to get specific customer credit data)
 function getCreditData($sub_system, $specific_cust_id = null)
 {
-	global $message, $decimal, $as_of, $cust_id, $cust_name, $cust_cr_balance0, $credit_total0, $days, $return_array;
+	global $message, $decimal, $as_of, $cust_id, $cust_name, $cust_cr_balance0, $credit_total0, $days, $return_array, $conn2;
 	$bm_cust_id = $bm_cust_name = $bm_total = $py_cust_id = $py_total = $days = $return_array = array();
 	$cashback_bm_cust = $cashback_bm_total = array();
 	$cust_id = array();
@@ -2238,7 +2238,7 @@ function getCheques($sub_system)
 {
 	global $chq0_id, $chq0_invno, $chq0_cuname, $chq0_amount, $chq0_no, $chq0_bank, $chq0_branch, $chq0_date, $chq0_paymentdate, $chq0_returndate, $chq0_code, $chq0_salesman, $salesman_filter, $chq2_banked, $chq2_retuned,
 	$chq0_group_id, $chq0_group_name, $chq0_user_id, $chq0_username, $chq2_postpone, $salesman, $group,
-	$chq0_postpond_id, $chq0_postpond_invno, $chq0_postpond_cuname, $chq0_postpond_amount, $chq0_postpond_no, $chq0_postpond_bank, $chq0_postpond_branch, $chq0_postponed_date, $chq0_postpond_paymentdate, $chq0_postpond_salesman, $chq0_postpond_date, $chq0_postpone, $chq0_postpond_code, $salesman_postpond_filter;
+	$chq0_postpond_id, $chq0_postpond_invno, $chq0_postpond_cuname, $chq0_postpond_amount, $chq0_postpond_no, $chq0_postpond_bank, $chq0_postpond_branch, $chq0_postponed_date, $chq0_postpond_paymentdate, $chq0_postpond_salesman, $chq0_postpond_date, $chq0_postpone, $chq0_postpond_code, $salesman_postpond_filter, $conn2;
 
 	$chq0_user_id = $chq0_group_id = $chq0_id = $chq0_postpond_id = $chq0_code = $salesman_filter = $chq0_salesman = array();
 
@@ -2410,7 +2410,7 @@ function validateQuotNo()
 // updated by nirmal 08_09_2025 (added tax_display_format when qo create time)
 function newQuot($cust0)
 {
-	global $message, $quot_no, $salesman, $cust;
+	global $message, $quot_no, $salesman, $cust,$conn;
 	$out = true;
 	$tax_display_format = $is_quotation_sent_with_tax = 0;
 

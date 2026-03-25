@@ -439,6 +439,7 @@ function listItem($sub_system){
 		}else{
 			$query = "SELECT DISTINCT `code`,`description` FROM inventory_items WHERE `sub_system`='$sub_system' AND `status`='1' AND $qry $item_filter_qry $item_type_qry LIMIT 20";
 		}
+		error_log("  Qry " . $query);
 		$result = mysqli_query($conn2, $query);
 		while ($row = mysqli_fetch_array($result)) {
 			if ($_GET['action'] == 'code-list') $data_list[] = $row[0];

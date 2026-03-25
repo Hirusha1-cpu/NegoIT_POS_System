@@ -121,7 +121,8 @@
 				<tr bgcolor="#467898" style="color:#F5F5F5"><th class="shipmentTB4">Order Number</th><th class="shipmentTB4">Order Date</th><th class="shipmentTB4">Picked Date</th><th class="shipmentTB4">Packed Date</th><th class="shipmentTB4">Amount</th></tr>
 				<?php 
 				$r1_total=0;
-				for($i=0;$i<sizeof($r1_odr_no);$i++){
+				// for($i=0;$i<sizeof($r1_odr_no);$i++){
+				for($i = 0; $i < sizeof($r1_odr_no ?? []); $i++){
 					$r1_total+=$r1_amount[$i];
 					if(($i%2)==0) $color='#E5E5E5'; else $color='#F5F5F5';
 					print '<tr bgcolor="'.$color.'" ><td class="shipmentTB4" align="center"><a style="text-decoration:none" href="index.php?components=order_process&action=list_one&id='.$r1_odr_no[$i].'">'.str_pad($r1_odr_no[$i], 7, "0", STR_PAD_LEFT).'</a></td><td class="shipmentTB4" align="center">'.$r1_odr_date[$i].'</td><td class="shipmentTB4" align="center">'.$r1_pick_date[$i].'</td><td class="shipmentTB4" align="center">'.$r1_pack_date[$i].'</td><td class="shipmentTB4" align="right">'.number_format($r1_amount[$i]).'</td></tr>';

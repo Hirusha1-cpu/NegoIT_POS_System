@@ -264,9 +264,15 @@ if ($message != '') {
 				<th colspan="2" align="right" style="padding-right:10px; padding-left:10px">Total Amount</th>';
 		for ($k = 0; $k < sizeof($days); $k++) {
 			$day = $days[$k];
-			print '<th align="right" style="padding-right:10px">' . number_format(${'credit_total' . $day}, $decimal) . '</th>';
+			// print '<th align="right" style="padding-right:10px">' . number_format(${'credit_total' . $day}, $decimal) . '</th>';
+			print '<th align="right" style="padding-right:10px">' . 
+number_format((float)(${'credit_total' . $day} ?? 0), $decimal) . 
+'</th>';
 		}
-		print '<th align="right" style="padding-right:10px">' . number_format($credit_total0, $decimal) . '</th></tr>';
+		// print '<th align="right" style="padding-right:10px">' . number_format($credit_total0, $decimal) . '</th></tr>';
+		print '<th align="right" style="padding-right:10px">' . 
+number_format((float)($credit_total0 ?? 0), $decimal) . 
+'</th></tr>';
 		?>
 	</table>
 </div>

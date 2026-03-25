@@ -393,7 +393,7 @@ if (isset($_REQUEST['message'])) {
 									</td>
 									<td>
 										<?php if (!isset($_GET['cust'])) {
-											if ($_COOKIE['retail'] == 0) { ?><input type="button" value="Create Cust"
+											if ($_COOKIE['retail'] == 0) { ?><input type="button" value="Create Custs"
 													onclick="BMCreateCust('wholesale_cust')" style="width:100px; height:50px;" /> <?php }
 											if ($_COOKIE['retail'] == 1) { ?><input type="button" value="Create Cust"
 													onclick="BMCreateCust('onetime_cust')" style="width:100px; height:50px;" /> <?php }

@@ -2041,7 +2041,7 @@ function dateMonthValidation($date)
 function getCustDOB()
 {
 	global $date, $cust_id, $cust_name, $cust_mob, $cust_dob, $cust_home_address, $cust_shop_address, $from_date,
-		$to_date, $cust_age;
+		$to_date, $cust_age, $conn2;
 	$cust_id = $cust_name = $cust_mob = $cust_dob = $cust_home_address = $cust_shop_address = $cust_age = array();
 	$category_qry = $store_qry = $user_query = '';
 	$out = true;
@@ -2116,6 +2116,7 @@ function generateTag()
 // added by nirmal 30_01_2025
 function groupStores2()
 {
+	global $conn2;
 	include('config.php');
 
 	$result = mysqli_query($conn2, "SELECT value FROM settings WHERE setting='systemid'");
@@ -3355,7 +3356,7 @@ function getCustSale($systemid)
 
 function getUnvisited($sub_system)
 {
-	global $from_date, $to_date, $visited_cust_id, $visited_cust_name, $unvisited_cust_id, $unvisited_cust_name, $visited_cust_sm_id, $visited_cust_sm_name, $unvisited_cust_sm_id, $unvisited_cust_sm_name;
+	global $from_date, $to_date, $visited_cust_id, $visited_cust_name, $unvisited_cust_id, $unvisited_cust_name, $visited_cust_sm_id, $visited_cust_sm_name, $unvisited_cust_sm_id, $unvisited_cust_sm_name,$conn2;
 	$unvisited_cust_id = $visited_custs = array();
 	include('config.php');
 
@@ -4422,7 +4423,7 @@ function fullClearPostpone()
 //-----------------------------------------Return-------------------------------//
 function getReturnSummary()
 {
-	global $rtn_inv, $rtn_date, $rtn_by, $rtn_cust, $from_date, $to_date, $cust;
+	global $rtn_inv, $rtn_date, $rtn_by, $rtn_cust, $from_date, $to_date, $cust, $conn2;
 	$store = $_COOKIE['store'];
 	$sm = $_GET['sm'];
 	$cu = $_GET['cu'];
@@ -4456,7 +4457,7 @@ function getReturnSummary()
 
 function getReturn($display)
 {
-	global $rtn_inv, $dis_id, $rtn_date, $rtn_by, $rtn_itm, $rtn_qty, $rtn_cust, $dis_date, $rtn_st, $dis_by, $from_date, $to_date, $cust;
+	global $rtn_inv, $dis_id, $rtn_date, $rtn_by, $rtn_itm, $rtn_qty, $rtn_cust, $dis_date, $rtn_st, $dis_by, $from_date, $to_date, $cust,$conn2;
 	$store = $_COOKIE['store'];
 	$sm = $_GET['sm'];
 	$cu = $_GET['cu'];
@@ -4512,7 +4513,7 @@ function getReturn($display)
 
 function getDisposal()
 {
-	global $permission, $dis_id, $dis_description, $dis_qty, $dis_store, $dis_date, $rtn_inv, $rtn_qty, $from_date, $to_date;
+	global $permission, $dis_id, $dis_description, $dis_qty, $dis_store, $dis_date, $rtn_inv, $rtn_qty, $from_date, $to_date,$conn2;
 	$store = $_COOKIE['store'];
 	$today = date("Y-m-d", time());
 	if (isset($_REQUEST['from_date']))
@@ -4655,7 +4656,7 @@ function unregisterDevice()
 // updated by nirmal 2025_01_20 (changed store variable name to something else, this cause store variable in views)
 function getUnlockedBills($sub_system)
 {
-	global $invoice_no, $billed_by, $billed_cust, $date, $time, $bill_store, $lock;
+	global $invoice_no, $billed_by, $billed_cust, $date, $time, $bill_store, $lock,$conn2;
 
 	if ($sub_system == 'all')
 		$sub_system_qry = '';
@@ -4664,10 +4665,28 @@ function getUnlockedBills($sub_system)
 	$invoice_no = array();
 	include('config.php');
 
-	$query = "SELECT DISTINCT bm.invoice_no,up.username,cu.name,DATE(bm.billed_timestamp),TIME(bm.billed_timestamp),st.name,bm.`lock`
-	FROM bill bi ,bill_main bm, userprofile up, cust cu, stores st
-	WHERE bi.invoice_no=bm.invoice_no AND bm.billed_by=up.id AND bm.`cust`=cu.id AND bm.store=st.id AND bm.`lock`!=1 AND bm.`status` NOT IN (0,7) $sub_system_qry
-	ORDER BY st.name, bm.billed_timestamp";
+	// $query = "SELECT DISTINCT bm.invoice_no,up.username,cu.name,DATE(bm.billed_timestamp),TIME(bm.billed_timestamp),st.name,bm.`lock`
+	// FROM bill bi ,bill_main bm, userprofile up, cust cu, stores st
+	// WHERE bi.invoice_no=bm.invoice_no AND bm.billed_by=up.id AND bm.`cust`=cu.id AND bm.store=st.id AND bm.`lock`!=1 AND bm.`status` NOT IN (0,7) $sub_system_qry
+	// ORDER BY st.name, bm.billed_timestamp";
+	$query = "SELECT DISTINCT 
+    bm.invoice_no,
+    up.username,
+    cu.name,
+    DATE(bm.billed_timestamp) as bill_date,
+    TIME(bm.billed_timestamp) as bill_time,
+    bm.billed_timestamp,
+    st.name,
+    bm.`lock`
+FROM bill bi
+JOIN bill_main bm ON bi.invoice_no = bm.invoice_no
+JOIN userprofile up ON bm.billed_by = up.id
+JOIN cust cu ON bm.cust = cu.id
+JOIN stores st ON bm.store = st.id
+WHERE bm.`lock` != 1 
+AND bm.`status` NOT IN (0,7) 
+$sub_system_qry
+ORDER BY st.name, bm.billed_timestamp";
 
 	$result = mysqli_query($conn2, $query);
 	while ($row = mysqli_fetch_array($result)) {
@@ -4685,7 +4704,7 @@ function getUnlockedBills($sub_system)
 // update by nirmal 03_05_2024 (added group clause to prevent duplicate bill no), 13_05_2024 (added salesman filter)
 function getTemporaryBills($sub_system)
 {
-	global $invoice_no, $billed_by, $billed_cust, $date, $time, $stores, $lock;
+	global $invoice_no, $billed_by, $billed_cust, $date, $time, $stores, $lock,$conn2;
 	if ($sub_system == 'all')
 		$sub_system_qry = '';
 	else
@@ -4701,9 +4720,27 @@ function getTemporaryBills($sub_system)
 			$salesmansearch = "AND up.`id`='" . $_REQUEST['salesman'] . "'";
 	}
 
-	$query = "SELECT DISTINCT bm.`bm_no`,up.`username`,cu.`name`,DATE(bi.`date`),TIME(bi.`date`),st.`name`
-	FROM bill_tmp bi ,bill_main_tmp bm, userprofile up, cust cu, stores st
-	WHERE bi.`bm_no`=bm.`bm_no` AND bm.`billed_by`=up.`id` AND bm.`cust`=cu.`id` AND bm.`store`=st.`id` AND bm.`status` NOT IN (0,7) $sub_system_qry $salesmansearch GROUP BY bm.`bm_no` ORDER BY st.`name`, bi.`date` DESC";
+	// $query = "SELECT DISTINCT bm.`bm_no`,up.`username`,cu.`name`,DATE(bi.`date`),TIME(bi.`date`),st.`name`
+	// FROM bill_tmp bi ,bill_main_tmp bm, userprofile up, cust cu, stores st
+	// WHERE bi.`bm_no`=bm.`bm_no` AND bm.`billed_by`=up.`id` AND bm.`cust`=cu.`id` AND bm.`store`=st.`id` AND bm.`status` NOT IN (0,7) $sub_system_qry $salesmansearch GROUP BY bm.`bm_no` ORDER BY st.`name`, bi.`date` DESC";
+
+	$query = "SELECT 
+    bm.`bm_no`,
+    MAX(up.`username`) as username,
+    MAX(cu.`name`) as customer_name,
+    DATE(MAX(bi.`date`)) as bill_date,
+    TIME(MAX(bi.`date`)) as bill_time,
+    MAX(st.`name`) as store_name
+FROM bill_tmp bi
+JOIN bill_main_tmp bm ON bi.`bm_no` = bm.`bm_no`
+JOIN userprofile up ON bm.`billed_by` = up.`id`
+JOIN cust cu ON bm.`cust` = cu.`id`
+JOIN stores st ON bm.`store` = st.`id`
+WHERE bm.`status` NOT IN (0,7) 
+$sub_system_qry 
+$salesmansearch
+GROUP BY bm.`bm_no`
+ORDER BY store_name, MAX(bi.`date`) DESC";
 
 	$result = mysqli_query($conn2, $query);
 	while ($row = mysqli_fetch_array($result)) {
@@ -5351,7 +5388,7 @@ function getSalesReport4($sub_system)
 // updated by nirmal 26_09_2022
 function salesByCategory($sub_system)
 {
-	global $fromdate, $todate, $cat_name, $cat_sale, $customer;
+	global $fromdate, $todate, $cat_name, $cat_sale, $customer, $conn2;
 
 	include('config.php');
 	// Date filter
@@ -5412,7 +5449,7 @@ function salesByCategory($sub_system)
 // updated by nirmal 19_08_2024 (get select sales rep list from view select option)
 function salesByRep($sub_system)
 {
-	global $fromdate, $todate, $category, $store, $rep_id, $rep_name, $itm_id, $itm_desc, $itm_qty, $itm_stock, $total_rep;
+	global $fromdate, $todate, $category, $store, $rep_id, $rep_name, $itm_id, $itm_desc, $itm_qty, $itm_stock, $total_rep, $conn2;
 	if (isset($_REQUEST['datefrom']))
 		$fromdate = $_REQUEST['datefrom'];
 	else
@@ -5525,7 +5562,7 @@ function salesByRep($sub_system)
 
 function getRepairIncome($sub_system)
 {
-	global $inf_company, $fromdate, $todate, $re_uid, $re_uname, $re_count, $re_amount, $del_uid, $del_uname, $del_count, $del_amount;
+	global $inf_company, $fromdate, $todate, $re_uid, $re_uname, $re_count, $re_amount, $del_uid, $del_uname, $del_count, $del_amount, $conn2;
 	$inf_company = inf_company(1);
 	if (isset($_GET['datefrom']))
 		$fromdate = $_GET['datefrom'];
@@ -5635,7 +5672,7 @@ function getUnicStatus($st_id)
 
 function getUnicItems()
 {
-	global $item_des, $store_arr, $status_list, $unic_item_id, $unic_item_des, $store_id, $store_name, $itu_shipment, $itu_sn, $itu_invoice_no, $itu_trans_no, $cust, $cust_id, $return_invoice_no, $item, $store, $status, $sn, $data_bill_no, $data_rtn_no, $data_tr_no, $warranty_no, $warranty_store, $warranty_st_name, $warranty_st_color;
+	global $item_des, $store_arr, $status_list, $unic_item_id, $unic_item_des, $store_id, $store_name, $itu_shipment, $itu_sn, $itu_invoice_no, $itu_trans_no, $cust, $cust_id, $return_invoice_no, $item, $store, $status, $sn, $data_bill_no, $data_rtn_no, $data_tr_no, $warranty_no, $warranty_store, $warranty_st_name, $warranty_st_color,$conn2;
 	$data_rtn_no = $data_bill_no = $data_tr_no = $itu_sn = $unic_item_id = $cust = $status_list = $item_des = $store_arr = $itu_trans_no = $itu_invoice_no = $return_invoice_no = $status_arr = $warranty_no = $warranty_store = $warranty_st_name = $warranty_st_color = array();
 	$status = '';
 	include('config.php');
@@ -9256,7 +9293,7 @@ function getQtyAudit($count)
 //-----------------------Quotation---------------------------------//
 function pendingQuot($sub_system)
 {
-	global $qm_id, $qm_created_date, $qm_validity, $qm_store, $qm_cust, $qm_amount, $qm_created_by, $qm_custid;
+	global $qm_id, $qm_created_date, $qm_validity, $qm_store, $qm_cust, $qm_amount, $qm_created_by, $qm_custid, $conn2;
 	$qm_amount = $qm_id = array();
 	include('config.php');
 
@@ -9320,7 +9357,7 @@ function decodeMapData()
 
 function getWarranty()
 {
-	global $from_date, $to_date, $store, $war_st_type, $inv_st_count, $wa_id, $wa_cl_date, $wa_cl_item, $wa_ho_date, $wa_ho_item, $wa_cust, $wa_suplier, $wa_cl_byid, $wa_cl_byname, $wa_store, $wa_status, $war_status_name, $war_status_color, $wac_id, $wac_cl_date, $wac_ho_date, $wac_cl_item, $wac_ho_item, $wac_cust, $wac_suplier, $wac_cl_byid, $wac_cl_byname, $wac_store;
+	global $from_date, $to_date, $store, $war_st_type, $inv_st_count, $wa_id, $wa_cl_date, $wa_cl_item, $wa_ho_date, $wa_ho_item, $wa_cust, $wa_suplier, $wa_cl_byid, $wa_cl_byname, $wa_store, $wa_status, $war_status_name, $war_status_color, $wac_id, $wac_cl_date, $wac_ho_date, $wac_cl_item, $wac_ho_item, $wac_cust, $wac_suplier, $wac_cl_byid, $wac_cl_byname, $wac_store,$conn2;
 	$store = $_GET['store'];
 	$wa_id = $wac_id = $item_arr = array();
 	$item_arr[''] = '';
@@ -9393,7 +9430,7 @@ function getWarranty()
 // update by nirmal 18_09_2023
 function getTaxReport($sub_system)
 {
-	global $from_date, $to_date, $total_tax, $group, $lock_req;
+	global $from_date, $to_date, $total_tax, $group, $lock_req, $conn2;
 
 	// date filter
 	$today = date("Y-m-d", time());
@@ -11690,7 +11727,7 @@ function getReturnAvailability($sub_system)
 // Helper to get items for the dropdown
 function getItemListMGR($sub_system)
 {
-	global $item_id_list, $item_name_list;
+	global $item_id_list, $item_name_list, $conn2;
 	include('config.php');
 	$sub_sys_qry = ($sub_system != 'all') ? "AND sub_system='$sub_system'" : "";
 

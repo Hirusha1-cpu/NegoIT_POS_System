@@ -23,11 +23,30 @@ function leaveStatus($st_id){
 }
 
 function myActiveInvoices($user_id){
-	global $hp_type,$hp_invoice_no,$hp_bill_date,$hp_cust,$hp_payday,$hp_amount,$hp_paycount,$hp_paidcount;
+	global $hp_type,$hp_invoice_no,$hp_bill_date,$hp_cust,$hp_payday,$hp_amount,$hp_paycount,$hp_paidcount, $conn2;
 	$hp_invoice_no=array();
 	if($user_id=='all') $qry_agent=""; else $qry_agent="AND bm.recovery_agent='$user_id'";
 	include('config.php');
-	$query="SELECT ht.`name`,hs.invoice_no,date(bm.billed_timestamp),cu.`name`,hs.`day`,hs.payment_amount,hs.payment_count,COUNT(hp.id) FROM bill_main bm, hp_schedule_type ht, cust cu, hp_inv_schedule hs LEFT JOIN hp_payments hp ON hs.id=hp.`schedule` WHERE bm.invoice_no=hs.invoice_no AND hs.`type`=ht.id AND bm.`cust`=cu.id AND bm.`lock`=1 AND bm.`status`!=0 AND hs.`status`=1 $qry_agent GROUP BY bm.invoice_no ORDER BY cu.`name`";
+	// $query="SELECT ht.`name`,hs.invoice_no,date(bm.billed_timestamp),cu.`name`,hs.`day`,hs.payment_amount,hs.payment_count,COUNT(hp.id) FROM bill_main bm, hp_schedule_type ht, cust cu, hp_inv_schedule hs LEFT JOIN hp_payments hp ON hs.id=hp.`schedule` WHERE bm.invoice_no=hs.invoice_no AND hs.`type`=ht.id AND bm.`cust`=cu.id AND bm.`lock`=1 AND bm.`status`!=0 AND hs.`status`=1 $qry_agent GROUP BY bm.invoice_no ORDER BY cu.`name`";
+	$query = "SELECT 
+    hs.invoice_no,
+    MAX(ht.name) as type_name,
+    DATE(MAX(bm.billed_timestamp)) as bill_date,
+    MAX(cu.name) as customer_name,
+    SUM(hs.payment_amount) as total_payment_amount,
+    SUM(hs.payment_count) as total_payment_count,
+    COUNT(hp.id) as total_paid_count
+FROM bill_main bm
+JOIN hp_inv_schedule hs ON bm.invoice_no = hs.invoice_no
+JOIN hp_schedule_type ht ON hs.type = ht.id
+JOIN cust cu ON bm.cust = cu.id
+LEFT JOIN hp_payments hp ON hs.id = hp.schedule
+WHERE bm.lock = 1 
+AND bm.status != 0 
+AND hs.status = 1 
+$qry_agent
+GROUP BY hs.invoice_no
+ORDER BY customer_name";
 	$result=mysqli_query($conn2,$query);
 	while($row=mysqli_fetch_array($result)){
 		$hp_type[]=$row[0];

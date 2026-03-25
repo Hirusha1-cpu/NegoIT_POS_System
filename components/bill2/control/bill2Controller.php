@@ -51,13 +51,13 @@ switch ($_REQUEST['action']) {
 
    case "code-list":
       include_once 'template/common.php';
-      listItem($sub_system);
+      listItema($sub_system);
       include_once 'template/ajax_list.php';
       break;
 
    case "desc-list":
       include_once 'template/common.php';
-      listItem($sub_system);
+      listItema($sub_system);
       include_once 'template/ajax_list.php';
       break;
 

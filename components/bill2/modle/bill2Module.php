@@ -93,7 +93,7 @@ function getSalesman2()
 
 function getSalesman3($sub_system)
 {
-	global $sm_id, $sm_name;
+	global $sm_id, $sm_name, $conn2;
 	include('config.php');
 
 	$query = "SELECT DISTINCT up.id, up.username FROM userprofile up
@@ -128,7 +128,7 @@ function getSalesman4($sub_system)
 // updated by nirmal 11_01_2022
 function getTechnicient()
 {
-	global $tech_id, $tech_name;
+	global $tech_id, $tech_name, $conn;
 	include('config.php');
 	$tech_id = $tech_name = array();
 	// $query="SELECT id,username FROM userprofile WHERE `status`='0' AND id NOT IN (SELECT DISTINCT `user` FROM permission WHERE `function` IN (1,2,3,6,7,8,9,10,12,13,14))AND id IN (SELECT DISTINCT `user` FROM permission WHERE `function` IN (4))";
@@ -220,6 +220,7 @@ function getUnicCashbackData($sub_system)
 // update by nirmal 02_08_2023 round and add decimal number to wholesale and retail dropdown
 function moreItem($sub_system, $systemid)
 {
+	global $conn;
 	include('config.php');
 	$itm_qty = $decimal = 0;
 	$increment = $itn_qty = '';
@@ -514,6 +515,7 @@ function getSNList($sub_system, $systemid)
 
 function getTMPBillItems($sub_system)
 {
+	global $conn;
 	$bm_no = $_GET['bm_no'];
 	$data_list = '';
 
@@ -1037,6 +1039,7 @@ function calculateDiscount($cust, $itemid, $price, $discount_value, $discount_ty
 
 function addToBill($sub_system)
 {
+	global $conn2, $conn;
 	$user_store = $_COOKIE['store'];
 	$system_user = $_COOKIE['user_id'];
 	$bm_no = $_GET['bm_no'];
@@ -1609,6 +1612,7 @@ function newTMPBill($sub_system, $cust_odr, $bill_sm, $qo_no)
 	$invoice_no = $bm_no = $back_off_com_type = 0;
 	$message = 'Done';
 	$qb_msg = '';
+	global $conn, $conn2;
 
 	$system_user = $_COOKIE['user_id'];
 	$district = $_COOKIE['district'];
@@ -1746,7 +1750,7 @@ function getBillMain($bill_no)
 {
 	global $discount, $hire_purchase, $bm_hire_purchase, $bm_type, $cust_odr, $cu_id, $cu_name, $cu_nic,
 	$cu_mobile, $gps_x, $gps_y, $salesman_id, $salesman_name, $recovery_agent, $cu_asso_sman, $cust_mtype,
-	$bill_item_count, $bill_total, $invoice_discount, $due_date;
+	$bill_item_count, $bill_total, $invoice_discount, $due_date, $conn;
 	$user_arr = array();
 
 	include('config.php');
@@ -1874,7 +1878,7 @@ function updateInvoiceDiscount($sub_system)
 	include('config.php');
 	$status = 'error';
 	$message = '';
-
+	global  $conn;
 	$id = isset($_POST['id']) ? $_POST['id'] : '';
 	$discount = isset($_POST['discount']) ? trim($_POST['discount']) : '';
 
@@ -1899,6 +1903,7 @@ function updateInvoiceDiscount($sub_system)
 // added by nirmal 04_03_2025
 function updateDueDate($sub_system)
 {
+	global $conn;
 	include('config.php');
 	$status = 'error';
 	$message = '';
@@ -2857,6 +2862,7 @@ function createInvoice($sub_system)
 
 function changeSalesman()
 {
+	global $conn;
 	$bm_no = $_GET['bm_no'];
 	$new_sm = $_GET['new_sm'];
 	$user_id = $_COOKIE['user_id'];
@@ -2915,7 +2921,7 @@ function getDiscount($sub_system)
 {
 	$itemid = $_GET['itemid'];
 	$cust_id = $_GET['cust'];
-
+	global $conn2;
 	include('config.php');
 	$query = "SELECT `status` FROM cust WHERE id='$cust_id'";
 	$row = mysqli_fetch_row(mysqli_query($conn2, $query));
@@ -2924,7 +2930,12 @@ function getDiscount($sub_system)
 	if ($cust_type == 1) {
 		$query = "SELECT min_w_rate,max_w_rate FROM inventory_items WHERE id='$itemid'";
 		$row = mysqli_fetch_row(mysqli_query($conn2, $query));
-		$rate = $row[0] . '% - ' . $row[1] . '%';
+		// $rate = $row[0] . '% - ' . $row[1] . '%';
+		if ($row) {
+			$rate = ($row[0] ?? 0) . '% - ' . ($row[1] ?? 0) . '%';
+		} else {
+			$rate = '0% - 0%';
+		}
 	} else
 		if ($cust_type == 2) {
 			$query = "SELECT max_r_rate FROM inventory_items WHERE id='$itemid'";
@@ -3619,7 +3630,7 @@ function getMasterCust($cust)
 {
 	$cust_mtype = 'normal';
 	include('config.php');
-
+	global $conn;
 	$query = "SELECT master_cust FROM cust WHERE id='$cust'";
 	$row = mysqli_fetch_row(mysqli_query($conn, $query));
 	$master_cust = $row[0];
@@ -5787,7 +5798,7 @@ function getCreditStatusOLD($sub_system, $cust_id)
 
 function getCustomerCreditLimit($cust_id)
 {
-	global $cust_cr_limit;
+	global $cust_cr_limit, $conn2;
 
 	include('config.php');
 	if ($cust_id !== null) {
@@ -5811,7 +5822,7 @@ function getCustomerCreditLimit($cust_id)
 
 function getCustomerPendingChequeAmount($cust_id)
 {
-	global $pending_chque;
+	global $pending_chque, $conn2;
 	$today = dateNow();
 	include('config.php');
 
@@ -5995,7 +6006,7 @@ function getQOPrice()
 // updated by nirmal 21_12_23
 function getCreditStatus2($cust)
 {
-	global $remaining_cr_limit;
+	global $remaining_cr_limit, $conn2;
 	$remaining_cr_limit = $totalbill0 = 0;
 	$today = dateNow();
 

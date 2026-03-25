@@ -52,7 +52,7 @@ function warrantySuAction($action)
 
 function getDistrict()
 {
-	global $district_id, $district_name, $current_district, $static_district;
+	global $district_id, $district_name, $current_district, $static_district, $conn;
 	$store = $_COOKIE['store'];
 	include('config.php');
 	$query = "SELECT id,name FROM district ORDER BY name";
@@ -181,7 +181,7 @@ function getItems2()
 // update by nirmal 21_10_2023
 function getItems($item_filter, $sub_system, $systemid)
 {
-	global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item;
+	global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item, $conn;
 	$unic_item_code = $qry_filter = '';
 	$unic_item_list = $unic = $tt_item = $tt_qty = $drawer = $qty = $r_price = $w_price = $description = $code = $id = $unic_item_list2 = $pr_sr = array();
 	$store = $_COOKIE['store'];
@@ -3127,7 +3127,7 @@ function setFastPrint()
 
 function getCust($status)
 {
-	global $cust_id, $cust_name, $cust_nic, $cust_mobile, $cust_asso_sman, $gps_x, $gps_y;
+	global $cust_id, $cust_name, $cust_nic, $cust_mobile, $cust_asso_sman, $gps_x, $gps_y,$conn;
 	$sub_system = $_COOKIE['sub_system'];
 	include('config.php');
 	$query = "SELECT cu.id,cu.name,cu.nic,cu.mobile,up.username,cu.gps_x,cu.gps_y FROM cust cu, userprofile up WHERE cu.associated_salesman=up.id AND cu.sub_system='$sub_system' AND cu.`status` IN ($status)";

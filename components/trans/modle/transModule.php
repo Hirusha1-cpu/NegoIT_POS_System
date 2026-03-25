@@ -36,7 +36,7 @@ function trnsStatus($status_id)
 // update by nirmal 21_11_2023
 function getItems()
 {
-	global $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $unic_item_code, $unic_item_list, $unic_qty;
+	global $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $unic_item_code, $unic_item_list, $unic_qty, $conn;
 	$store = $_COOKIE['store'];
 	$unic_cal = unicCal();
 	$unic_item_code = '';
@@ -107,7 +107,7 @@ function getItems()
 
 function getStores($systemid, $sub_system)
 {
-	global $store_id, $store_name;
+	global $store_id, $store_name, $conn2;
 	$store = $_COOKIE['store'];
 	$user_id = $_COOKIE['user_id'];
 	$sub_sys_qry = "AND sub_system='0'";
@@ -193,7 +193,7 @@ function processInventoryNew($item, $lastitem)
 
 function newGTN()
 {
-	global $message, $gtn_no;
+	global $message, $gtn_no,$conn;
 	$salesman = $_COOKIE['user_id'];
 	$fromstore = $_COOKIE['store'];
 	$gtn_no = '';
@@ -772,7 +772,7 @@ function pickGTN()
 function getGTNlist($type)
 {
 	global $gtn_no, $date, $time, $gtn_status, $gtn_color, $user, $salesman, $gtn_total_w_price, $gtn_total_c_price, $gtn_to_storeid,
-	$gtn_from_store, $gtn_to_store, $approve_permission, $gtn_remote_user, $gtn_cross_invoice, $cross_inv;
+	$gtn_from_store, $gtn_to_store, $approve_permission, $gtn_remote_user, $gtn_cross_invoice, $cross_inv, $conn;
 	$gtn_no = array();
 	if (isset($_REQUEST['date'])) {
 		$todaydate = $_REQUEST['date'];
@@ -1230,7 +1230,7 @@ function crossSubmitGTN()
 // updated by nirmal 16_11_23
 function getItemInTransfer()
 {
-	global $gtn_no, $from_store, $to_store, $username, $invoice_no, $description, $qty, $date, $time, $status, $gtn_status_temp, $gtn_status, $gtn_color;
+	global $gtn_no, $from_store, $to_store, $username, $invoice_no, $description, $qty, $date, $time, $status, $gtn_status_temp, $gtn_status, $gtn_color, $conn;
 	$gtn_no = $from_store = $to_store = $username = $invoice_no = $description = $qty = $date = $time = $gtn_status = $gtn_color = array();
 	include('config.php');
 	$query = "SELECT tm.`gtn_no`, st1.`name`, st2.`name`, us.`username`, tm.`invoice_no`, ii.`description`, t.`qty`, DATE(tm.`date`), TIME(tm.`date`), tm.`status`
