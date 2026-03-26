@@ -520,7 +520,7 @@ switch ($_REQUEST['action']) {
    //-----------------------------Chque_Postpone------------------------------------//
    case "chque_postpone":
       include_once 'components/manager/modle/managerModule.php';
-      getChqueNo($sub_system, 1);
+      getChqueNoa($sub_system, 1);
       getPostponedChque($sub_system);
       getChqueOne();
       include_once 'components/manager/view/chque_postpone.php';

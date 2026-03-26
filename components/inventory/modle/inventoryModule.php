@@ -302,6 +302,7 @@ function getDefaultPrices()
 // added by nirmal 21_9_24
 function getMainShipmentID()
 {
+	global $conn;
 	include('config.php');
 	$result = mysqli_query($conn, "SELECT id FROM shipment_main ORDER BY id DESC LIMIT 1");
 	$row = mysqli_fetch_assoc($result);
@@ -472,7 +473,7 @@ function addShipment($sub_system, $ship_date, $suplier, $ship_inv_no, $ship_inv_
 // added by nirmal 21_09_24
 function addShipmentToMain($sub_system, $ship_date, $suplier, $ship_inv_no, $ship_inv_date, $ship_inv_dudate, $unic)
 {
-	global $message, $shipment_no;
+	global $message, $shipment_no, $conn;
 	$shipment_no = getMainShipmentID();
 	$user = $_COOKIE['user_id'];
 	include('config.php');
@@ -764,6 +765,7 @@ function listCodeData($itmstatus)
 
 function getItemData()
 {
+	global $conn2;
 	$case = $_GET['case'];
 	$item = $_GET['item'];
 	$store = $_COOKIE['store'];
@@ -1461,7 +1463,7 @@ function getShipmentItemsTmp($shipment_no)
 // added by nirmal 21_9_2
 function getShipmentUnicItemsTmp($shipment_no)
 {
-	global $ship_itm_id, $ship_itm_desc, $ship_itm_qty, $editable, $ship_itm_st_name, $ship_itm_st_color;
+	global $ship_itm_id, $ship_itm_desc, $ship_itm_qty, $editable, $ship_itm_st_name, $ship_itm_st_color, $conn2;
 	$ship_itm_id = $ship_itm_desc = $ship_itm_qty = $ship_itm_st_name = $ship_itm_st_color = array();
 
 	if ($shipment_no != "") {
@@ -1561,7 +1563,7 @@ function getShipmentItems()
 
 function getUnicList()
 {
-	global $unic_cal, $itu_id, $itu_sn, $itu_status, $itm_description, $itu_w_price, $itu_r_price, $itu_c_price;
+	global $unic_cal, $itu_id, $itu_sn, $itu_status, $itm_description, $itu_w_price, $itu_r_price, $itu_c_price, $conn2;
 	$itu_sn = array();
 	$unic_cal = unicCal();
 	if (isset($_GET['ins_id'])) {
@@ -1821,6 +1823,7 @@ function deleteUnic($ins_id0, $sn)
 // added by nirmal 21_9_8
 function verifySnTmp($shipment_no, $sn, $attempt)
 {
+	global $conn;
 	include('config.php');
 	$case = 0;
 
@@ -2091,7 +2094,7 @@ function addQtyTmp($shipment, $unic, $itm_id, $qty, $c_price, $w_price, $r_price
 // added by nirmal 21_9_6
 function addQtyFinal($shipment_num, $unic, $code, $qty, $c_price, $w_price, $r_price, $c_price2, $w_price2, $r_price2, $sn)
 {
-	global $message, $shipment_no;
+	global $message, $shipment_no, $conn;
 	$shipment_no = $shipment_num;
 	$user = $_COOKIE['user'];
 	$store = $_COOKIE['store'];
@@ -2333,7 +2336,7 @@ function addQtyFinal($shipment_num, $unic, $code, $qty, $c_price, $w_price, $r_p
 function oneShipmentTmpFinalize($shipment_no, $sub_req, $sub_system)
 {
 	include('config.php');
-	global $main_shipment_no, $action, $message;
+	global $main_shipment_no, $action, $message, $conn;
 	$user_store = $_COOKIE['store'];
 
 	$ship_tmp_item_id = $unic = $inv_code = $add_qty = $c_price = $w_price = $r_price = $c_price2 = $w_price2 = $r_price2 = $ship_date = $suplier =
@@ -3112,7 +3115,7 @@ function removeShipmentQtyItemTmp()
 // added by nirmal 21_9_2
 function removeUnicShipmentItemTmp()
 {
-	global $message, $shipment_no;
+	global $message, $shipment_no,$conn;
 	$itemid = $_GET['itm_id'];
 	$user_id = $_COOKIE['user_id'];
 	$message = 'Item was removed from shipment!';
@@ -3955,7 +3958,8 @@ function getShipmentList($systemid, $sub_system)
 					$totalOfDeletedShipments += $row[8];
 				}
 				$status[] = $row[9];
-				if (($time_now - $timestamp) < (3600 * $shipment_edit_time)) {
+				// if (($time_now - $timestamp) < (3600 * $shipment_edit_time)) {
+				if (((int)($time_now ?? 0) - (int)($timestamp ?? 0)) < (3600 * (int)($shipment_edit_time ?? 0))) {
 					if ($row[5] == 1) {
 						if (validateDeleteShipment($row[0], 1))
 							$active[] = true;
@@ -4018,6 +4022,7 @@ function getTmpShipmentPendingList($sub_system)
 
 function validateDeleteShipment($id, $case)
 {
+	global $conn2;
 	include('config.php');
 	$out = false;
 	$query = "SELECT unic FROM shipment_main WHERE id='$id'";
@@ -4046,7 +4051,7 @@ function oneShipment()
 {
 	global $unicCal, $shipment_no, $ins_id, $ins_item, $ins_old_qty, $ins_added_qty, $ins_addedby, $ins_date, $ins_time, $ins_store, $ins_cost,
 	$ins_cost_total, $itm_unic, $sm_date, $sm_supplier, $sm_invoice_no, $sm_invoice_date, $sm_invoice_duedate, $sm_unic, $sm_action, $sm_status,
-	$itm_code;
+	$itm_code, $conn2;
 	$shipment_no = $_REQUEST['shipment_no'];
 	$unicCal = false;
 	$ins_id = $ins_date = array();
@@ -4203,7 +4208,7 @@ function reorderRepairParts()
 
 function authDeleteShipment()
 {
-	global $message, $shipment_no;
+	global $message, $shipment_no, $conn;
 	$shipment_no = $_GET['shipment_no'];
 	$out = true;
 	$msg = 'Error: There war an error while deleting shipment!. Please contact NegoIT.';
@@ -5233,7 +5238,7 @@ function applyBulkTag()
 //-----------------------------------------BARCODE-----------------------------------------//
 function getOneItem2($sub_system, $systemid)
 {
-	global $id, $code, $description, $c_price, $w_price, $r_price, $drawer;
+	global $id, $code, $description, $c_price, $w_price, $r_price, $drawer, $conn2;
 	if (isset($_REQUEST['code'])) {
 		$value = $_REQUEST['code'];
 		$case = 'code';

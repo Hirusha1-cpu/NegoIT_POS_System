@@ -63,7 +63,7 @@ switch ($_REQUEST['action']) {
 
    case "sn-list":
       include_once 'components/bill2/modle/bill2Module.php';
-      listSN($sub_system);
+      listSNa($sub_system);
       include_once 'template/ajax_list.php';
       break;
 
@@ -779,7 +779,7 @@ switch ($_REQUEST['action']) {
 
    case "finish_return":
       include_once 'components/bill2/modle/bill2Module.php';
-      returnDetails();
+      returnDetailsa();
       billTemplate();
       if (isMobile())
          include_once 'components/bill2/view/m_return_finish.php';

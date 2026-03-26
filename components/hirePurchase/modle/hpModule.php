@@ -154,7 +154,7 @@ function getCustName(){
 }
 			
 function custList($sub_system,$user_id){
-global $his_cu_id,$his_cu_name;
+global $his_cu_id,$his_cu_name, $conn2;
 	if($sub_system=='all') $sub_system_qry=""; else	$sub_system_qry="AND cu.`sub_system`='$sub_system'";
 	if($user_id=='all') $qry_agent=""; else $qry_agent="AND bm.recovery_agent='$user_id'";
 
@@ -288,7 +288,7 @@ function hpsPayScheduleUpcomming($cal_start_date,$hp_type,$hp_date,$hp_count,$to
 }
 
 function upCommingCollection($user_id){
-global 	$future,$upcol_inv,$upcol_amo,$upcol_remaining,$upcol_type,$upcol_inst,$downcol_inv,$downcol_amo,$downcol_remaining,$downcol_type,$downcol_inst;
+global 	$future,$upcol_inv,$upcol_amo,$upcol_remaining,$upcol_type,$upcol_inst,$downcol_inv,$downcol_amo,$downcol_remaining,$downcol_type,$downcol_inst, $conn2;
 	$upcol_inv=$upcol_amo=$upcol_remaining=$upcol_type=$upcol_inst=array();
 	$downcol_inv=$downcol_amo=$downcol_remaining=$downcol_type=$downcol_inst=array();
 	if(isset($_GET['future'])) $future=$_GET['future']; else $future='UpComming';
@@ -337,7 +337,7 @@ global 	$future,$upcol_inv,$upcol_amo,$upcol_remaining,$upcol_type,$upcol_inst,$
 }
 
 function getInvoiceOutstanding($user_id,$sub_system){
-global 	$group,$town,$cu_gp_id,$cu_gp_name,$cu_tw_id,$cu_tw_name,$type,$cu_id,$downcol_inv,$downcol_amo,$downcol_inv_outstanding,$downcol_type,$downcol_inst,$downcol_cust_id,$downcol_cust_name,$downcol_tel,$sch_type_id,$sch_type_name,$monthb0L,$monthb1L,$monthb2L,$monthb3L,$monthb0N,$monthb1N,$monthb2N,$monthb3N;
+global 	$group,$town,$cu_gp_id,$cu_gp_name,$cu_tw_id,$cu_tw_name,$type,$cu_id,$downcol_inv,$downcol_amo,$downcol_inv_outstanding,$downcol_type,$downcol_inst,$downcol_cust_id,$downcol_cust_name,$downcol_tel,$sch_type_id,$sch_type_name,$monthb0L,$monthb1L,$monthb2L,$monthb3L,$monthb0N,$monthb1N,$monthb2N,$monthb3N, $conn2;
 	$cu_gp_id=$cu_tw_id=$downcol_inv=$downcol_amo=$downcol_remaining=$downcol_type=$downcol_inst=$sch_type_id=array();
 	$inv_no=0;
 	$today=dateNow();

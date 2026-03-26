@@ -1,36 +1,66 @@
 <?php
 // update by nirmal 18_10_2023
+// function getCategory()
+// {
+// 	global $category_id, $category_name, $sub_id, $sub_name, $category_sub, $disable_in_bill, $conn;
+// 	$category_id = $category_name = $sub_id = $sub_name = $sub_list = $disable_in_bill = array();
+// 	include('config.php');
+
+// 	$query = "SELECT id,name FROM `sub_system` WHERE `status`=1 ORDER BY name";
+// 	$result = mysqli_query($conn, $query);
+// 	while ($row = mysqli_fetch_array($result)) {
+// 		$sub_id[] = $row[0];
+// 		$sub_name[] = $row[1];
+// 		$sub_list[$row[0]] = $row[1];
+// 	}
+
+// 	$query = "SELECT `id`,`name`,`sub_system`,`status` FROM item_category";
+// 	$result = mysqli_query($conn, $query);
+// 	while ($row = mysqli_fetch_array($result)) {
+// 		$category_id[] = $row[0];
+// 		$category_name[] = $row[1];
+// 		if ($row[2] == 'all') {
+// 			$category_sub[] = 'All';
+// 		} else {
+// 			$category_sub[] = $sub_list[$row[2]];
+// 		}
+// 		$disable_in_bill[] = $row[3];
+// 	}
+// }
 function getCategory()
 {
-	global $category_id, $category_name, $sub_id, $sub_name, $category_sub, $disable_in_bill;
-	$category_id = $category_name = $sub_id = $sub_name = $sub_list = $disable_in_bill = array();
-	include('config.php');
+    global $category_id, $category_name, $sub_id, $sub_name, $category_sub, $disable_in_bill, $conn;
+    $category_id = $category_name = $sub_id = $sub_name = $sub_list = $disable_in_bill = array();
+    include('config.php');
 
-	$query = "SELECT id,name FROM `sub_system` WHERE `status`=1 ORDER BY name";
-	$result = mysqli_query($conn, $query);
-	while ($row = mysqli_fetch_array($result)) {
-		$sub_id[] = $row[0];
-		$sub_name[] = $row[1];
-		$sub_list[$row[0]] = $row[1];
-	}
+    $query = "SELECT id,name FROM `sub_system` WHERE `status`=1 ORDER BY name";
+    $result = mysqli_query($conn, $query);
+    while ($row = mysqli_fetch_array($result)) {
+        $sub_id[] = $row[0];
+        $sub_name[] = $row[1];
+        $sub_list[$row[0]] = $row[1];
+    }
 
-	$query = "SELECT `id`,`name`,`sub_system`,`status` FROM item_category";
-	$result = mysqli_query($conn, $query);
-	while ($row = mysqli_fetch_array($result)) {
-		$category_id[] = $row[0];
-		$category_name[] = $row[1];
-		if ($row[2] == 'all') {
-			$category_sub[] = 'All';
-		} else {
-			$category_sub[] = $sub_list[$row[2]];
-		}
-		$disable_in_bill[] = $row[3];
-	}
+    $query = "SELECT `id`,`name`,`sub_system`,`status` FROM item_category";
+    $result = mysqli_query($conn, $query);
+    while ($row = mysqli_fetch_array($result)) {
+        $category_id[] = $row[0];
+        $category_name[] = $row[1];
+        
+        // Fix: Use null coalescing to provide a fallback value
+        if ($row[2] == 'all') {
+            $category_sub[] = 'All';
+        } else {
+            $category_sub[] = $sub_list[$row[2]] ?? 'Unknown (' . ($row[2] ?? 'N/A') . ')';
+        }
+        
+        $disable_in_bill[] = $row[3];
+    }
 }
 
 function getBanks()
 {
-	global $bank_id, $bank_name;
+	global $bank_id, $bank_name, $conn;
 	include('config.php');
 	$query = "SELECT id,name FROM bank WHERE `status`=1";
 	$result = mysqli_query($conn, $query);
@@ -43,7 +73,7 @@ function getBanks()
 function getUsers()
 {
 	global $function_id, $function_name, $uprof_id, $uprof_name, $per_id, $usr_name, $usr_type, $usr_function, $st_id, $st_name, $uprof_store, $uprof_status, $storeavailable,
-	$uprof_devicecheck, $uprof_timecheck, $uprof_mobrep, $uprof_sub_system, $uprof_map_inv, $st_sub_sys, $uprof_sub_sysnm, $sub_sysid, $sub_sysname;
+	$uprof_devicecheck, $uprof_timecheck, $uprof_mobrep, $uprof_sub_system, $uprof_map_inv, $st_sub_sys, $uprof_sub_sysnm, $sub_sysid, $sub_sysname, $conn;
 	include('config.php');
 
 	$components = $_GET['components'];
@@ -702,7 +732,7 @@ function deleteCategory()
 //------------------------------------System Settings-----------------------------//
 function getSettings()
 {
-	global $inventory_temp_fagmented, $time_from, $time_to, $time_now, $precal_err_inv;
+	global $inventory_temp_fagmented, $time_from, $time_to, $time_now, $precal_err_inv, $conn;
 	$precal_err_inv = array();
 	include('config.php');
 	$result = mysqli_query($conn, "SELECT COUNT(itq_id) as `count` FROM inventory_temp");
@@ -841,7 +871,7 @@ function updateTime()
 //----------------------------------------Devices---------------------------------//
 function getDevices()
 {
-	global $dev_id, $dev_name, $dev_exp, $dev_status, $one_dev_name, $usr_id, $usr_name;
+	global $dev_id, $dev_name, $dev_exp, $dev_status, $one_dev_name, $usr_id, $usr_name, $conn;
 	$one_dev_name = '';
 	$dev_id = array();
 	include('config.php');
@@ -957,7 +987,7 @@ function renameDevice()
 
 function getDevicePermission()
 {
-	global $per_id, $per_dev, $per_user;
+	global $per_id, $per_dev, $per_user, $conn;
 	$per_id = array();
 	include('config.php');
 	$query = "SELECT dp.id,dv.name,up.username FROM device_permission dp, devices dv, userprofile up WHERE dp.device=dv.id AND dp.`user`=up.id";
@@ -1080,7 +1110,7 @@ function getMKTUser(){
 
 function getAllocation()
 {
-	global $up2_id, $up2_name, $up2_groups, $user_id, $gp_id, $gp_name, $allo_groupid, $allo_groupname;
+	global $up2_id, $up2_name, $up2_groups, $user_id, $gp_id, $gp_name, $allo_groupid, $allo_groupname, $conn2;
 	if (isset($_GET['user_id']))
 		$user_id = $_GET['user_id'];
 	else

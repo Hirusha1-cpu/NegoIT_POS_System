@@ -1,6 +1,6 @@
 <?php
 function getSubSystems(){
-	global $sub_system_list,$sub_system_names;
+	global $sub_system_list,$sub_system_names,$conn2;
 	include('config.php');
 	$query="SELECT id,name FROM sub_system WHERE `status`=1";
 	$result=mysqli_query($conn2,$query);
@@ -89,7 +89,7 @@ function getCust(){
 }
 
 function getUsers(){
-	global $user_id,$user_name;
+	global $user_id,$user_name, $conn2;
 	include('config.php');
 		$query="SELECT id,username FROM userprofile WHERE `status`=0 ORDER BY username";
 		$result=mysqli_query($conn2,$query);
@@ -100,7 +100,7 @@ function getUsers(){
 }
 
 function getCustGroups(){
-	global $gp_id,$gp_name;
+	global $gp_id,$gp_name, $conn2;
 	include('config.php');
 		$query="SELECT id,name FROM cust_group ORDER BY name";
 		$result=mysqli_query($conn2,$query);
@@ -112,7 +112,7 @@ function getCustGroups(){
 
 // update by nirmal change store variable name to stores
 function salesReport(){
-	global $invoice_no,$time,$invoice_total,$invoice_profit,$date1,$date2,$item_req,$type_req,$salesman_req,$store_req,$cust_req,$invoice_type,$color,$total_discount,$invo_salesman,$cust,$stores,$graph_user,$graph_total,$bi_discount,$rtn_no,$rtn_time,$rtn_pay,$rtn_salesman,$rtn_store,$rtn_cust,$group,$invoice_cost,$cat_id,$cat_name,$cat_select,$sub_system0,$hp;
+	global $invoice_no,$time,$invoice_total,$invoice_profit,$date1,$date2,$item_req,$type_req,$salesman_req,$store_req,$cust_req,$invoice_type,$color,$total_discount,$invo_salesman,$cust,$stores,$graph_user,$graph_total,$bi_discount,$rtn_no,$rtn_time,$rtn_pay,$rtn_salesman,$rtn_store,$rtn_cust,$group,$invoice_cost,$cat_id,$cat_name,$cat_select,$sub_system0,$hp, $conn2;
 	$sub_system0=$group=$store_req=$cust_req=$cust_qry=$stores_qry=$salesman_req=$salesman_qry=$item_req=$item_qry=$type_req=$pr_sr=$type_qry=$hp_qry=$group_qry=$sub_system_qry=$cat_list='';
 	$cat_id=$invoice_no=$invoice_total=$invoice_profit=$invo_salesman=$invoice_type=$cust=$stores=$graph_user=$graph_total=$rtn_pay=$rtn_no=array();
 	$total=0;
@@ -256,12 +256,26 @@ function salesReport(){
 
 // updated by nirmal 21_11_1
 function deletedList(){
-	global $bi_inv_no,$bi_date,$bi_inv_total,$bi_inv_profit,$bi_deleted_by,$bi_asso_pay,$bm_delete_ack,$py_inv_no,$py_date,$py_amount,$py_deleted_by,$py_delete_ack,$rt_inv_no,$rt_date,$rt_deleted_by,$rt_delete_ack;
+	global $bi_inv_no,$bi_date,$bi_inv_total,$bi_inv_profit,$bi_deleted_by,$bi_asso_pay,$bm_delete_ack,$py_inv_no,$py_date,$py_amount,$py_deleted_by,$py_delete_ack,$rt_inv_no,$rt_date,$rt_deleted_by,$rt_delete_ack, $conn2;
 	$total=0;
 	$bi_inv_no=$py_inv_no=$rt_inv_no=$rt_date=$rt_deleted_by=array();
 	include('config.php');
 
-	$query="SELECT bi.invoice_no,date(bi.date),SUM(bi.qty*bi.unit_price),SUM((bi.qty*bi.unit_price)-(bi.qty*bi.cost)),up.username,bm.delete_ack FROM bill_main bm, bill bi, userprofile up WHERE bm.invoice_no=bi.invoice_no AND bm.deleted_by=up.id AND bm.`status`=0 GROUP BY bi.invoice_no ORDER BY bm.`deleted_timestamp` DESC LIMIT 100";
+	// $query="SELECT bi.invoice_no,date(bi.date),SUM(bi.qty*bi.unit_price),SUM((bi.qty*bi.unit_price)-(bi.qty*bi.cost)),up.username,bm.delete_ack FROM bill_main bm, bill bi, userprofile up WHERE bm.invoice_no=bi.invoice_no AND bm.deleted_by=up.id AND bm.`status`=0 GROUP BY bi.invoice_no ORDER BY bm.`deleted_timestamp` DESC LIMIT 100";
+	$query = "SELECT 
+            bi.invoice_no,
+            DATE(bi.date) AS bill_date,
+            SUM(bi.qty * bi.unit_price) AS total_amount,
+            SUM((bi.qty * bi.unit_price) - (bi.qty * bi.cost)) AS total_profit,
+            up.username AS deleted_by,
+            bm.delete_ack
+          FROM bill_main bm
+          INNER JOIN bill bi ON bm.invoice_no = bi.invoice_no
+          INNER JOIN userprofile up ON bm.deleted_by = up.id
+          WHERE bm.`status` = 0
+          GROUP BY bi.invoice_no, bill_date, up.username, bm.delete_ack
+          ORDER BY bm.`deleted_timestamp` DESC
+          LIMIT 100";
 	$result=mysqli_query($conn2,$query);
 	while($row=mysqli_fetch_array($result)){
 		$tmp_inv_no=$row[0];
@@ -300,7 +314,7 @@ function deletedList(){
 }
 
 function salesman(){
-	global $salesman_id,$salesman_name,$invoice_count,$commision,$date;
+	global $salesman_id,$salesman_name,$invoice_count,$commision,$date, $conn2;
 	if(isset($_REQUEST['date'])){
 	$date=$_REQUEST['date'];
 	}else{
@@ -552,7 +566,7 @@ function exportExcelProfitReport(){
 
 //---------------------------------Credit-------------------------------------//
 function getStore(){
-	global $st_id,$st_name;
+	global $st_id,$st_name, $conn2;
 	include('config.php');
 	$query="SELECT id,name FROM stores WHERE `status`=1 ORDER BY name";
 	$result=mysqli_query($conn2,$query);
@@ -588,7 +602,7 @@ function getPOitems(){
 }
 
 function getItems(){
-global $itm_code,$itm_description;
+global $itm_code,$itm_description,$conn2;
 	include('config.php');
 		$query="SELECT code,description FROM inventory_items WHERE `status`=1";
 		$result=mysqli_query($conn2,$query);
@@ -599,7 +613,7 @@ global $itm_code,$itm_description;
 }
 
 function getCategory(){
-global $itc_id,$itc_name;
+global $itc_id,$itc_name, $conn2;
 	include('config.php');
 		$query="SELECT id,`name` FROM item_category ORDER BY `name`";
 		$result=mysqli_query($conn2,$query);
@@ -610,7 +624,7 @@ global $itc_id,$itc_name;
 }
 
 function getCustomerSS(){
-global $cust_id,$cust_name;
+global $cust_id,$cust_name, $conn2;
 	$store=$_COOKIE['store'];
 	include('config.php');
 		$query="SELECT cu.id,cu.`name`,ss.`name` FROM cust cu, sub_system ss WHERE cu.`sub_system`=ss.id AND cu.`status`=1";
@@ -622,7 +636,7 @@ global $cust_id,$cust_name;
 }
 
 function salesTrend(){
-global $from,$to,$sys,$tr1_month,$tr1_sale,$tr1_profit,$tr3_item,$tr3_sale,$tr4_category,$tr4_sale,$tr5_item,$tr5_sale,$tr6_category,$tr6_sale,$st_id,$st_name,$tr2_store_sale;
+global $from,$to,$sys,$tr1_month,$tr1_sale,$tr1_profit,$tr3_item,$tr3_sale,$tr4_category,$tr4_sale,$tr5_item,$tr5_sale,$tr6_category,$tr6_sale,$st_id,$st_name,$tr2_store_sale, $conn2;
 	if(isset($_REQUEST['from_date']))	$from=$_REQUEST['from_date']; else $from=$date=date("Y-m-d",time()- 60*60*24*365 );
 	if(isset($_REQUEST['to_date']))	$to=$_REQUEST['to_date']; else $to=$date=date("Y-m-d",time());
 	$sys=$_REQUEST['sys'];
@@ -641,7 +655,22 @@ global $from,$to,$sys,$tr1_month,$tr1_sale,$tr1_profit,$tr3_item,$tr3_sale,$tr4_
 		$st_name[]=$row[1];
 	}
 
-	$query="SELECT year(bm.billed_timestamp),monthname(bm.billed_timestamp),month(bm.billed_timestamp),round(SUM(bi.unit_price * bi.qty)),round(SUM((bi.unit_price - bi.cost)*bi.qty)) FROM bill_main bm, bill bi WHERE bm.invoice_no=bi.invoice_no AND bm.`status` NOT IN (0,6,7) AND bm.`lock`=1 AND date(bm.billed_timestamp) BETWEEN  '$from' AND '$to' $sys_qry1 GROUP BY year(bm.billed_timestamp), month(bm.billed_timestamp) ORDER BY bm.billed_timestamp LIMIT 12";
+	// $query="SELECT year(bm.billed_timestamp),monthname(bm.billed_timestamp),month(bm.billed_timestamp),round(SUM(bi.unit_price * bi.qty)),round(SUM((bi.unit_price - bi.cost)*bi.qty)) FROM bill_main bm, bill bi WHERE bm.invoice_no=bi.invoice_no AND bm.`status` NOT IN (0,6,7) AND bm.`lock`=1 AND date(bm.billed_timestamp) BETWEEN  '$from' AND '$to' $sys_qry1 GROUP BY year(bm.billed_timestamp), month(bm.billed_timestamp) ORDER BY bm.billed_timestamp LIMIT 12";
+	$query = "SELECT 
+            YEAR(bm.billed_timestamp) AS bill_year,
+            MONTHNAME(bm.billed_timestamp) AS bill_month_name,
+            MONTH(bm.billed_timestamp) AS bill_month,
+            ROUND(SUM(bi.unit_price * bi.qty)) AS total_sales,
+            ROUND(SUM((bi.unit_price - bi.cost) * bi.qty)) AS total_profit
+          FROM bill_main bm
+          INNER JOIN bill bi ON bm.invoice_no = bi.invoice_no
+          WHERE bm.`status` NOT IN (0,6,7) 
+            AND bm.`lock` = 1 
+            AND DATE(bm.billed_timestamp) BETWEEN '$from' AND '$to' 
+            $sys_qry1 
+          GROUP BY bill_year, bill_month_name, bill_month
+          ORDER BY bill_year, bill_month
+          LIMIT 12";
 	$result=mysqli_query($conn2,$query);
 	while($row=mysqli_fetch_array($result)){
 		$tmp_monthname=$row[0].' - '.substr($row[1],0,3);
@@ -687,7 +716,7 @@ global $from,$to,$sys,$tr1_month,$tr1_sale,$tr1_profit,$tr3_item,$tr3_sale,$tr4_
 }
 
 function creditTrend(){
-global $from,$to,$sys,$group,$store,$tr1_month,$tr1_sale,$tr1_credit,$tr3_item,$tr3_sale,$tr4_category,$tr4_sale,$tr5_item,$tr5_sale,$tr6_category,$tr6_sale,$gp_id,$gp_name,$st_id,$st_name,$tr2_store_credit;
+global $from,$to,$sys,$group,$store,$tr1_month,$tr1_sale,$tr1_credit,$tr3_item,$tr3_sale,$tr4_category,$tr4_sale,$tr5_item,$tr5_sale,$tr6_category,$tr6_sale,$gp_id,$gp_name,$st_id,$st_name,$tr2_store_credit, $conn2;
 	if(isset($_REQUEST['from_date']))	$from=$_REQUEST['from_date']; else $from=$date=date("Y-m-d",time()- 60*60*24*365 );
 	if(isset($_REQUEST['to_date']))	$to=$_REQUEST['to_date']; else $to=$date=date("Y-m-d",time());
 	if(isset($_REQUEST['sys'])) $sys=$_REQUEST['sys']; else $sys='all';
@@ -734,7 +763,21 @@ global $from,$to,$sys,$group,$store,$tr1_month,$tr1_sale,$tr1_credit,$tr3_item,$
 		$st_name[]=$row[1];
 	}
 
-	$query="SELECT year(bm.billed_timestamp),monthname(bm.billed_timestamp),month(bm.billed_timestamp),round(SUM(bm.`invoice_+total` + bm.`invoice_-total`)) FROM bill_main bm, cust cu WHERE bm.`cust`=cu.id AND bm.`status` NOT IN (0,6,7) AND bm.`lock`=1 AND date(bm.billed_timestamp) BETWEEN  '$from' AND '$to' $sys_qry2 $gp_qry $st_qry GROUP BY year(bm.billed_timestamp), month(bm.billed_timestamp) ORDER BY bm.billed_timestamp LIMIT 12";
+	// $query="SELECT year(bm.billed_timestamp),monthname(bm.billed_timestamp),month(bm.billed_timestamp),round(SUM(bm.`invoice_+total` + bm.`invoice_-total`)) FROM bill_main bm, cust cu WHERE bm.`cust`=cu.id AND bm.`status` NOT IN (0,6,7) AND bm.`lock`=1 AND date(bm.billed_timestamp) BETWEEN  '$from' AND '$to' $sys_qry2 $gp_qry $st_qry GROUP BY year(bm.billed_timestamp), month(bm.billed_timestamp) ORDER BY bm.billed_timestamp LIMIT 12";
+	$query = "SELECT 
+            YEAR(bm.billed_timestamp) AS bill_year,
+            MONTHNAME(bm.billed_timestamp) AS bill_month_name,
+            MONTH(bm.billed_timestamp) AS bill_month,
+            ROUND(SUM(bm.`invoice_+total` + bm.`invoice_-total`)) AS total_credit
+          FROM bill_main bm
+          INNER JOIN cust cu ON bm.`cust` = cu.id
+          WHERE bm.`status` NOT IN (0,6,7) 
+            AND bm.`lock` = 1 
+            AND DATE(bm.billed_timestamp) BETWEEN '$from' AND '$to' 
+            $sys_qry2 $gp_qry $st_qry
+          GROUP BY bill_year, bill_month_name, bill_month
+          ORDER BY bill_year, bill_month
+          LIMIT 12";
 	$result=mysqli_query($conn2,$query);
 	while($row=mysqli_fetch_array($result)){
 		$tmp_monthname=$row[0].' - '.substr($row[1],0,3);
@@ -765,7 +808,7 @@ global $from,$to,$sys,$group,$store,$tr1_month,$tr1_sale,$tr1_credit,$tr3_item,$
 }
 
 function getSalesman(){
-	global $salesman_list;
+	global $salesman_list, $conn2;
 	include('config.php');
 	$query="SELECT username FROM userprofile WHERE `status`=0";
 	$result=mysqli_query($conn2,$query);
@@ -859,7 +902,7 @@ function getPcommision(){
 }
 
 function returnItems(){
-	global $category,$item,$cust,$salesman_idlist,$salesman_list,$from_date,$to_date,$rtn_inv,$rtn_date,$rtn_by,$rtn_cust,$rtn_st,$rtn_store,$disp_id,$disp_description,$disp_qty,$disp_store,$disp_date,$disp_cost,$drtn_inv,$drtn_qty,$graph1_item,$graph1_qty,$graph2_item,$graph2_qty,$graph3_cust,$graph3_qty,$graph4_salesman,$graph4_qty;
+	global $category,$item,$cust,$salesman_idlist,$salesman_list,$from_date,$to_date,$rtn_inv,$rtn_date,$rtn_by,$rtn_cust,$rtn_st,$rtn_store,$disp_id,$disp_description,$disp_qty,$disp_store,$disp_date,$disp_cost,$drtn_inv,$drtn_qty,$graph1_item,$graph1_qty,$graph2_item,$graph2_qty,$graph3_cust,$graph3_qty,$graph4_salesman,$graph4_qty, $conn2;
 	$j=$disp_id_tmp=0;
 	$k=-1;
 	$sm_qry=$cust_qry=$cat_qry=$item_qry="";
@@ -986,7 +1029,7 @@ function returnOne(){
 }
 
 function getCost(){
-	global $st_name,$store_c_total,$store_w_total,$store_wmin_total,$disposal_total,$from_date,$to_date,$itc_id,$itc_name,$itc_total,$pending_tr_no,$pending_tr_date,$pending_tr_amount,$pending_bm_no,$pending_bm_date,$pending_bm_amount;
+	global $st_name,$store_c_total,$store_w_total,$store_wmin_total,$disposal_total,$from_date,$to_date,$itc_id,$itc_name,$itc_total,$pending_tr_no,$pending_tr_date,$pending_tr_amount,$pending_bm_no,$pending_bm_date,$pending_bm_amount, $conn2;
 	if(isset($_REQUEST['from_date'])) $from_date=$_REQUEST['from_date']; else $from_date=date("Y-m-d",time()-(60*60*24*30));
 	if(isset($_REQUEST['to_date'])) $to_date=$_REQUEST['to_date']; else $to_date=date("Y-m-d",time());
 	$store_c_total=$store_w_total=$store_wmin_total=$itc_name=$pending_tr_no=$pending_tr_date=$pending_tr_amount=$pending_bm_no=$pending_bm_date=$pending_bm_amount=array();
@@ -1016,9 +1059,9 @@ function getCost(){
 
 		$query1="SELECT SUM(itn.c_price*itn.qty) as `c_total`,SUM(itn.w_price*itn.qty) as `w_total`,SUM(itn.w_price*itn.qty* ((100-itm.min_w_rate)/100)) as `wmin_total`  FROM inventory_new itn, inventory_items itm WHERE itm.id=itn.item AND itm.pr_sr=1 AND itn.store='$st_id' $qry1";
 		$row1=mysqli_fetch_row(mysqli_query($conn2,$query1));
-		$newinv_c_total=round($row1[0]);
-		$newinv_w_total=round($row1[1]);
-		$newinv_wmin_total=round($row1[2]);
+		$newinv_c_total=round($row1[0] ?? 0);
+		$newinv_w_total=round($row1[1] ?? 0);
+		$newinv_wmin_total=round($row1[2] ?? 0);
 
 		$store_c_total[$row[1]]=$inv_c_total+$newinv_c_total;
 		$store_w_total[$row[1]]=$inv_w_total+$newinv_w_total;
@@ -1026,7 +1069,7 @@ function getCost(){
 
 		$result1 = mysqli_query($conn2,"SELECT SUM(c_price*qty) as `total` FROM return_disposal WHERE store='$st_id' AND date(`date`) BETWEEN '$from_date' AND '$to_date'");
 		$row1 = mysqli_fetch_assoc($result1);
-		$disposal_total[$row[1]]=round($row1['total']);
+		$disposal_total[$row[1]]=round($row1['total'] ?? 0);
 	}
 		$query="SELECT itc.id,itc.`name` FROM item_category itc ORDER BY itc.`name`";
 		$result=mysqli_query($conn2,$query);
@@ -1066,7 +1109,7 @@ function getCost(){
 }
 
 function getUnlockedBills2(){
-	global $invoice_no,$billed_by,$billed_store,$date,$time,$lock;
+	global $invoice_no,$billed_by,$billed_store,$date,$time,$lock, $conn2;
 	$invoice_no=array();
 	include('config.php');
 	$query="SELECT DISTINCT bm.invoice_no,up.username,st.name,DATE(bm.billed_timestamp),TIME(bm.billed_timestamp),bm.`lock` FROM bill bi ,bill_main bm, userprofile up, stores st WHERE bi.invoice_no=bm.invoice_no AND bm.billed_by=up.id AND bm.store=st.id AND bm.`lock`!=1 AND bm.`status` NOT IN (0,7)";
@@ -1081,27 +1124,72 @@ function getUnlockedBills2(){
 	}
 }
 
+// function getItembySalesman(){
+// 	global $from_date,$to_date,$item,$salesman,$soldqty;
+// 	$salesman=array();
+// 	$item=$_GET['item'];
+// 	$from_date=$_GET['from_date'];
+// 	$to_date=$_GET['to_date'];
+// 	if(isset($_GET['item'])){
+// 		if(($_GET['item']!='')&&($_GET['from_date']!='')&&($_GET['to_date']!='')){
+// 			include('config.php');
+// 			$query="SELECT up.username,SUM(bi.qty) FROM bill_main bm, bill bi, inventory_items itm, userprofile up WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.billed_by=up.id AND bm.`status` NOT IN (0,7) AND bm.`lock`=1 AND (bi.`date` BETWEEN '$from_date' AND '$to_date') AND itm.description='$item' GROUP BY up.id ORDER BY up.username";
+// 			$result=mysqli_query($conn2,$query);
+// 			while($row=mysqli_fetch_array($result)){
+// 				$salesman[]=$row[0];
+// 				$soldqty[]=$row[1];
+// 			}
+// 		}
+// 	}
+// }
 function getItembySalesman(){
-	global $from_date,$to_date,$item,$salesman,$soldqty;
-	$salesman=array();
-	$item=$_GET['item'];
-	$from_date=$_GET['from_date'];
-	$to_date=$_GET['to_date'];
-	if(isset($_GET['item'])){
-		if(($_GET['item']!='')&&($_GET['from_date']!='')&&($_GET['to_date']!='')){
-			include('config.php');
-			$query="SELECT up.username,SUM(bi.qty) FROM bill_main bm, bill bi, inventory_items itm, userprofile up WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.billed_by=up.id AND bm.`status` NOT IN (0,7) AND bm.`lock`=1 AND (bi.`date` BETWEEN '$from_date' AND '$to_date') AND itm.description='$item' GROUP BY up.id ORDER BY up.username";
-			$result=mysqli_query($conn2,$query);
-			while($row=mysqli_fetch_array($result)){
-				$salesman[]=$row[0];
-				$soldqty[]=$row[1];
-			}
-		}
-	}
+    global $from_date, $to_date, $item, $salesman, $soldqty;
+    
+    // Initialize arrays to prevent null errors
+    $salesman = [];
+    $soldqty = [];
+    
+    // Check if all required GET parameters exist
+    if(isset($_GET['item']) && isset($_GET['from_date']) && isset($_GET['to_date'])){
+        
+        $item = $_GET['item'];
+        $from_date = $_GET['from_date'];
+        $to_date = $_GET['to_date'];
+        
+        // Check if values are not empty
+        if($item != '' && $from_date != '' && $to_date != ''){
+            include('config.php');
+            
+            $query = "SELECT up.username, SUM(bi.qty) 
+                      FROM bill_main bm
+                      INNER JOIN bill bi ON bm.invoice_no = bi.invoice_no
+                      INNER JOIN inventory_items itm ON bi.item = itm.id
+                      INNER JOIN userprofile up ON bm.billed_by = up.id
+                      WHERE bm.`status` NOT IN (0,7) 
+                        AND bm.`lock` = 1 
+                        AND (bi.`date` BETWEEN '$from_date' AND '$to_date') 
+                        AND itm.description = '$item' 
+                      GROUP BY up.id 
+                      ORDER BY up.username";
+            
+            $result = mysqli_query($conn2, $query);
+            
+            if ($result) {
+                while($row = mysqli_fetch_array($result)){
+                    $salesman[] = $row[0] ?? '';
+                    $soldqty[] = $row[1] ?? 0;
+                }
+                mysqli_free_result($result);
+            }
+        }
+    } else {
+        // Optional: Log or handle missing parameters
+        error_log("Missing required GET parameters in getItembySalesman()");
+    }
 }
 
 function getPendingApproval(){
-	global $loan_id,$loan_amount,$loan_emp,$loan_paidoff,$loan_start,$loan_end,$loan_duration,$ship_id,$ship_date,$ship_submit_by;
+	global $loan_id,$loan_amount,$loan_emp,$loan_paidoff,$loan_start,$loan_end,$loan_duration,$ship_id,$ship_date,$ship_submit_by,$conn2;
 	$loan_id=$ship_id=array();
 	include('config.php');
 	$query="SELECT lm.id,lm.amount,lm.rate,lm.duration,up.username,date(lm.start_date) FROM userprofile up, loan_main lm LEFT JOIN loan_pay lp ON lm.id=lp.loan_id WHERE lm.emp_id=up.id AND lm.`status`=1 GROUP BY lm.id ORDER BY lm.id";
@@ -1150,7 +1238,7 @@ function setLoanStatus($new_status){
 }
 
 function setShipmentStatus($new_status){
-	global $message;
+	global $message,$conn;
 	$id=$_GET['id'];
 	$user=$_COOKIE['user_id'];
 	$today1=timeNow();
@@ -1265,7 +1353,7 @@ function getTransAuditLog(){
 }
 
 function getNewCust(){
-	global $from_date,$to_date,$st_id,$st_name,$salesman_id,$up_salesman,$new_cust_count,$new_activecust_count,$store;
+	global $from_date,$to_date,$st_id,$st_name,$salesman_id,$up_salesman,$new_cust_count,$new_activecust_count,$store, $conn2;
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
 		$from_date=$_GET['from_date'];
 		$to_date=$_GET['to_date'];
@@ -1309,7 +1397,7 @@ function getNewCust(){
 }
 
 function getCrLimitAudit(){
-	global $from_date,$to_date,$cla_old_limit,$cla_new_limit,$cu_name,$cu_id,$changed_by,$changed_date;
+	global $from_date,$to_date,$cla_old_limit,$cla_new_limit,$cu_name,$cu_id,$changed_by,$changed_date, $conn2;
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
 		$from_date=$_GET['from_date'];
 		$to_date=$_GET['to_date'];
@@ -1333,7 +1421,7 @@ function getCrLimitAudit(){
 
 // update by nirmal 02_11_2023
 function getEditQtyAudit(){
-	global $item,$from_date,$to_date,$ie_date,$ie_store,$ie_item,$ie_item_cost,$ie_old_qty,$ie_action_qty,$ie_user,$ie_comment;
+	global $item,$from_date,$to_date,$ie_date,$ie_store,$ie_item,$ie_item_cost,$ie_old_qty,$ie_action_qty,$ie_user,$ie_comment, $conn2;
 	$qry_itm='';
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
 		$from_date=$_GET['from_date'];
@@ -1364,7 +1452,7 @@ function getEditQtyAudit(){
 }
 
 function getLoginAudit(){
-	global $user,$from_date,$to_date,$lo_user,$lo_date,$lo_time,$lo_device;
+	global $user,$from_date,$to_date,$lo_user,$lo_date,$lo_time,$lo_device, $conn2;
 	$qry_user='';
 	$lo_user=$lo_date=array();
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
@@ -1391,7 +1479,7 @@ function getLoginAudit(){
 }
 
 function getBillEditAudit(){
-	global $user,$from_date,$to_date,$ie_user,$ie_act_date,$ie_invoice,$ie_ori_date,$ie_new_date,$ie_ori_sm,$ie_new_sm,$ie_ori_rg,$ie_new_rg;
+	global $user,$from_date,$to_date,$ie_user,$ie_act_date,$ie_invoice,$ie_ori_date,$ie_new_date,$ie_ori_sm,$ie_new_sm,$ie_ori_rg,$ie_new_rg, $conn2;
 	$qry_user='';
 	$user_arr=$ie_user=$lo_user=$lo_date=array();
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
@@ -1430,7 +1518,7 @@ function getBillEditAudit(){
 }
 
 function getPayEditAudit(){
-	global $user,$from_date,$to_date,$ie_user,$ie_invoice,$ie_ori_date,$ie_new_date,$ie_ori_sm,$ie_new_sm,$ie_act_date;
+	global $user,$from_date,$to_date,$ie_user,$ie_invoice,$ie_ori_date,$ie_new_date,$ie_ori_sm,$ie_new_sm,$ie_act_date, $conn2;
 	$qry_user='';
 	$ie_user=$lo_user=$lo_date=array();
 	if(isset($_GET['from_date']) && isset($_GET['to_date'])){
@@ -1467,7 +1555,7 @@ function getPayEditAudit(){
 }
 
 function getCategoryProfit(){
-	global $subsys,$from_date,$to_date,$category,$c_price,$s_price,$iprofit;
+	global $subsys,$from_date,$to_date,$category,$c_price,$s_price,$iprofit, $conn2;
 	$subsys_qry=$tags_qry="";
 	$category=array();
 	include('config.php');
@@ -1519,7 +1607,7 @@ function getCategoryProfit(){
 
 // added by nirmal 08_02_2022
 function getSMCommission(){
-	global $inv_no,$inv_total, $cust, $salesman, $salesman_id, $sm_commission, $comission_total, $sm_commission_arr, $sm_list;
+	global $inv_no,$inv_total, $cust, $salesman, $salesman_id, $sm_commission, $comission_total, $sm_commission_arr, $sm_list, $conn2;
 	$inv_no = $inv_total = $cust = $salesman = $sm_commission = $comission_total = $salesman_id = $sm_commission_arr = $sm_list =  array();
 
 	$order_qry = '';
@@ -1572,7 +1660,7 @@ function getSMCommission(){
 
 // added by nirmal 08_02_2022
 function smGenerateCommission(){
-	global $message;
+	global $message, $conn, $conn2;
 	$month = $_POST['month'] . '-01';
 	$sm_selected = $_POST['sm_selected'];
 	$user_id = $_COOKIE['user_id'];
@@ -1620,7 +1708,10 @@ function smGenerateCommission(){
 			$result1 = mysqli_query($conn2, $query1);
 
 			while ($row1 = mysqli_fetch_array($result1)) {
-				if(($row[1] != '0') && (substr($row[1], 0, 1) != '-')){
+				$value = isset($row[1]) ? $row[1] : null;
+				if ($value !== null && $value != '0' && substr((string)$value, 0, 1) != '-') {
+
+				// if(($row[1] != '0') && (substr($row[1], 0, 1) != '-')){
 					$invoice_total = (double) $row1[1];
 					$query2 = "SELECT  py.`payment_type`, py.`chque_clear`, py.`amount`, py.`chque_return` FROM payment py, bill_main bm WHERE bm.`invoice_no` = py.`invoice_no`  AND py.`invoice_no` = '$row1[0]' AND py.`status`='0'";
 					$result2 = mysqli_query($conn2, $query2);
@@ -1655,7 +1746,7 @@ function smGenerateCommission(){
 
 // added by nirmal 08_02_2022
 function getSMCommissionList(){
-	global $com_id, $com_month, $com_gen_date, $com_gen_by;
+	global $com_id, $com_month, $com_gen_date, $com_gen_by, $conn2;
 	$com_id = $com_month = $com_gen_date = $com_gen_by = array();
 	$user_qry = $user_tbl = $tbl_qry = '';
 	$components = $_REQUEST['components'];
@@ -1790,7 +1881,7 @@ function smDeleteCommission($force){
 
 // added by nirmal 04_04_2022
 function getSMCommissionIncomplete(){
-	global $inv_no,$inv_total, $cust, $salesman, $salesman_id, $sm_commission, $comission_total, $sm_commission_arr, $sm_list, $reason, $paid_amount;
+	global $inv_no,$inv_total, $cust, $salesman, $salesman_id, $sm_commission, $comission_total, $sm_commission_arr, $sm_list, $reason, $paid_amount, $conn2;
 	$inv_no = $inv_total = $cust = $salesman = $sm_commission = $comission_total = $salesman_id = $sm_commission_arr = $sm_list = $reason = $paid_amount =  array();
 
 	$order_qry = $result1 = $user = $user_qry= '';
@@ -1862,7 +1953,7 @@ function getSMCommissionIncomplete(){
 
 //--------------------------------------------Hirepurchase--------------------------------------------------------------//
 function getExceededPendingPayments(){
-	global $warning_date1, $warning_date2, $warning_date3, $dd_hp_schedule, $dd_rec_ag_id, $dd_rec_ag_name, $dd_inv, $dd_instalment, $dd_py_schedule_date, $dd_hp_type, $salesman_filter, $filter_rec_agent, $filter_type, $de_rec_sch, $de_rec_instdate;
+	global $warning_date1, $warning_date2, $warning_date3, $dd_hp_schedule, $dd_rec_ag_id, $dd_rec_ag_name, $dd_inv, $dd_instalment, $dd_py_schedule_date, $dd_hp_type, $salesman_filter, $filter_rec_agent, $filter_type, $de_rec_sch, $de_rec_instdate, $conn2;
 	$dd_hp_schedule = $dd_rec_ag_id = $dd_rec_ag_name = $dd_inv = $dd_instalment = $dd_py_schedule_date = $dd_hp_type = $de_rec_sch = $de_rec_instdate = array();
 	$filter_rec_agent = $_GET['rec_agent'];
 	$filter_type = $_GET['type'];
@@ -1996,7 +2087,7 @@ function removeDeduction(){
 }
 
 function getHPCommission(){
-	global $sm_rate, $rg_rate, $sm_order, $rg_order, $his_id, $sm_late_deduct, $rg_late_deduct, $his_inv, $his_cust, $his_sm, $his_rg, $his_bill_total, $his_hp_total, $his_sm_pay, $his_rg_pay, $deduct_his_id, $deduct_his_inv, $deduct_his_cust, $deduct_his_sm, $deduct_his_sm, $deduct_his_rg, $deduct_inst_date, $deduct_py_amount, $sm_list, $rg_list, $sm_commission_arr, $rg_commission_arr;
+	global $sm_rate, $rg_rate, $sm_order, $rg_order, $his_id, $sm_late_deduct, $rg_late_deduct, $his_inv, $his_cust, $his_sm, $his_rg, $his_bill_total, $his_hp_total, $his_sm_pay, $his_rg_pay, $deduct_his_id, $deduct_his_inv, $deduct_his_cust, $deduct_his_sm, $deduct_his_sm, $deduct_his_rg, $deduct_inst_date, $deduct_py_amount, $sm_list, $rg_list, $sm_commission_arr, $rg_commission_arr, $conn2;
 	$sm_order = $rg_order = false;
 	$his_sm = $his_rg = $sm_list = $rg_list = $sm_commission_arr = $rg_commission_arr = $deduct_his_id = $deduct_his_sm = $deduct_his_rg = array();
 	$order_qry = '';
@@ -2197,7 +2288,7 @@ function hpGenerateCommission($sub_system){
 }
 
 function getHPCommissionList(){
-	global $hc_id, $hc_month, $hc_gen_date, $hc_gen_by;
+	global $hc_id, $hc_month, $hc_gen_date, $hc_gen_by, $conn2;
 	$hc_id = array();
 	include('config.php');
 	$query = "SELECT hc.id,hc.`month`,hc.generated_date,up.username FROM hp_commission_main hc, userprofile up WHERE hc.generated_by=up.id ORDER BY hc.`month` DESC, hc.id DESC";

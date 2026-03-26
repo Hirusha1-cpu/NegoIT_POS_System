@@ -511,13 +511,13 @@ if (isset($_REQUEST['message'])) {
 						<tr>
 							<td style="background-color:#467898; color:white;" class="shipmentTB4">Bill Comment 1</td>
 							<td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4">
-								<?php print ucfirst($main_comment1); ?>
+								<?php print ucfirst($main_comment1 ?? ''); ?>
 							</td>
 						</tr>
 						<tr>
 							<td style="background-color:#467898; color:white;" class="shipmentTB4">Bill Comment 2</td>
 							<td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4">
-								<?php print ucfirst($main_comment1); ?>
+								<?php print ucfirst($main_comment1 ?? ''); ?>
 							</td>
 						</tr>
 						<tr>

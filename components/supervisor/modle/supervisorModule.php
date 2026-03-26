@@ -1,7 +1,7 @@
 <?php
 function getSubSystems()
 {
-	global $sub_system_list, $sub_system_names;
+	global $sub_system_list, $sub_system_names, $conn2;
 	include('config.php');
 	$query = "SELECT id,name FROM sub_system WHERE `status`=1";
 	$result = mysqli_query($conn2, $query);
@@ -50,7 +50,7 @@ function getUnlockedBills()
 // update by nirmal 10_05_2024, 13_05_2024 (added salesman filter)
 function getTemporaryBills()
 {
-	global $invoice_no, $billed_by, $billed_cust, $date, $time;
+	global $invoice_no, $billed_by, $billed_cust, $date, $time, $conn2;
 	$store = $_COOKIE['store'];
 	$invoice_no = array();
 	include('config.php');
@@ -63,9 +63,27 @@ function getTemporaryBills()
 			$salesmansearch = "AND up.`id`='" . $_REQUEST['salesman'] . "'";
 	}
 
-	$query = "SELECT DISTINCT bm.`bm_no`,up.`username`,cu.`name`,DATE(bi.`date`),TIME(bi.`date`),st.`name`
-	FROM bill_tmp bi ,bill_main_tmp bm, userprofile up, cust cu, stores st
-	WHERE bi.`bm_no`=bm.`bm_no` AND bm.`billed_by`=up.`id` AND bm.`cust`=cu.`id` AND bm.`store`=st.`id` AND bm.`status` NOT IN (0,7) AND bm.`store`='$store' $salesmansearch GROUP BY bm.`bm_no` ORDER BY st.`name`, bi.`date` DESC";
+	// $query = "SELECT DISTINCT bm.`bm_no`,up.`username`,cu.`name`,DATE(bi.`date`),TIME(bi.`date`),st.`name`
+	// FROM bill_tmp bi ,bill_main_tmp bm, userprofile up, cust cu, stores st
+	// WHERE bi.`bm_no`=bm.`bm_no` AND bm.`billed_by`=up.`id` AND bm.`cust`=cu.`id` AND bm.`store`=st.`id` AND bm.`status` NOT IN (0,7) AND bm.`store`='$store' $salesmansearch GROUP BY bm.`bm_no` ORDER BY st.`name`, bi.`date` DESC";
+	$query = "SELECT DISTINCT bm.`bm_no`, up.`username`, cu.`name`, 
+          MIN(DATE(bi.`date`)) as bill_date, 
+          MIN(TIME(bi.`date`)) as bill_time, 
+          st.`name`
+          FROM bill_tmp bi, bill_main_tmp bm, userprofile up, cust cu, stores st
+          WHERE bi.`bm_no` = bm.`bm_no` 
+          AND bm.`billed_by` = up.`id` 
+          AND bm.`cust` = cu.`id` 
+          AND bm.`store` = st.`id` 
+          AND bm.`status` NOT IN (0,7) 
+          AND bm.`store` = '$store' 
+          $salesmansearch 
+          GROUP BY bm.`bm_no` 
+          ORDER BY st.`name`, bill_date DESC, bill_time DESC";
+$result = mysqli_query($conn2, $query);
+while ($row = mysqli_fetch_array($result)) {
+    // Access: $row['bill_date'], $row['bill_time']
+}
 	$result = mysqli_query($conn2, $query);
 	while ($row = mysqli_fetch_array($result)) {
 		$invoice_no[] = $row[0];
@@ -195,7 +213,7 @@ function dailySale($store)
 	$billed_by, $billed_cust, $billed_time, $billed_store, $payment_cash, $payment_chque, $payment_card, $payment_bank, $payment_id,
 	$payment_amount, $payment_type, $payment_salesman, $payment_cust, $payment_time, $payment_store, $bi_discount, $payment_cheque_no, $payment_cheque_date,
 	$rtn_no, $rtn_time, $rtn_pay, $rtn_salesman, $rtn_store, $rtn_cust, $wa_no, $wa_time, $wa_pay, $wa_salesman, $wa_entity, $wa_store, $item_type,
-	$invoice_tax, $invoice_total_wo_tax;
+	$invoice_tax, $invoice_total_wo_tax, $conn2;
 
 	// $invoice_no = $payment_id = $rtn_no = $wa_no = $graph_user = $graph_total = $item_type = $payment_cheque_date = $payment_cheque_no = array();
 	$invoice_no = $invoice_Total = $billed_district = $billed_by = $billed_cust = $billed_time = $billed_store = $bi_discount = $payment_cash = $payment_chque =
@@ -2333,7 +2351,7 @@ function getCheques($sub_system)
 // update by nirmal 29_07_2024 (get quotation comment)
 function getQuotationItems()
 {
-	global $qi_id, $qo_itm_des, $qo_itm_qty, $qo_itm_uprice, $total, $item_filter, $qo_discount, $qo_comment;
+	global $qi_id, $qo_itm_des, $qo_itm_qty, $qo_itm_uprice, $total, $item_filter, $qo_discount, $qo_comment, $conn2;
 	$pr_sr = '';
 	$total = 0;
 	$qo_itm_des = $qo_comment = array();
@@ -2389,6 +2407,7 @@ function updateQuotComment()
 // update by nirmal 17_05_2024 (change validation logic)
 function validateQuotNo()
 {
+	global $conn2;
 	include('config.php');
 	$quote_no = $_REQUEST['id'];
 	$salesman = $_GET['s'];

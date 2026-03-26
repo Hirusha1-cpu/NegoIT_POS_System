@@ -23,7 +23,7 @@ function leaveStatus($st_id){
 }
 
 function hrUsers(){
-	global $user_id,$user_name;
+	global $user_id,$user_name, $conn;
 	$user_id=array();
 	include('config.php');
 	$query="SELECT up.id,up.username FROM userprofile up, hr_leave_to_user ltu WHERE ltu.`user`=up.id AND up.`status`=0 GROUP BY up.id ORDER BY up.username";
@@ -35,7 +35,7 @@ function hrUsers(){
 }
 
 function getLeaveFormData($systemid,$sub_system){
-	global $approver,$leave_id,$leave_name,$remaining_days,$user,$checkout;
+	global $approver,$leave_id,$leave_name,$remaining_days,$user,$checkout, $conn;
 	$user_id=$user=$_COOKIE['user_id'];
 	$today=dateNow();
 	if(isset($_GET['leave_user'])){
@@ -106,7 +106,7 @@ function getLeaveFormData($systemid,$sub_system){
 }
 
 function getLeaveType(){
-	global $leave_id,$leave_name;
+	global $leave_id,$leave_name, $conn;
 	include('config.php');
 	$query="SELECT id,name FROM hr_leave_type WHERE `status`=1";
 	$result=mysqli_query($conn,$query);
@@ -117,7 +117,7 @@ function getLeaveType(){
 }
 
 function getLeaveTypeData(){
-	global $user_id,$user_name,$leave_allo;
+	global $user_id,$user_name,$leave_allo, $conn;
 	$leave_allo=array();
 	include('config.php');
 	$query="SELECT id,username FROM userprofile WHERE `status`=0 ORDER BY username";
@@ -222,7 +222,7 @@ function applyLeave($sub_system){
 
 
 function getUserLeaves($case){
-	global $llog_id,$llog_user,$llog_apply_by,$llog_apply_date,$llog_approve_reject_by,$llog_approve_reject_date,$llog_from_date,$llog_to_date,$llog_type,$llog_days,$llog_reason,$llog_st_name,$llog_st_color,$filter_type,$filter_emp,$selected_st,$from_date,$to_date,$selected_year,$year_list;
+	global $llog_id,$llog_user,$llog_apply_by,$llog_apply_date,$llog_approve_reject_by,$llog_approve_reject_date,$llog_from_date,$llog_to_date,$llog_type,$llog_days,$llog_reason,$llog_st_name,$llog_st_color,$filter_type,$filter_emp,$selected_st,$from_date,$to_date,$selected_year,$year_list, $conn;
 	$user=$_COOKIE['user_id'];
 	$filter_type=$filter_emp=$from_date=$to_date=$qry_year=$qry_date_range='';
 	if(isset($_GET['leave_user'])){
@@ -444,7 +444,7 @@ function deleteLeave($approver1){
 }
 
 function getShopStaff(){
-	global $given_date,$store_id,$store_name,$total_staff_id,$total_staff_name,$onleave_staff;
+	global $given_date,$store_id,$store_name,$total_staff_id,$total_staff_name,$onleave_staff, $conn;
 	$store_id=$store_name=array();
 	if(isset($_GET['given_date'])){
 		$given_date=$_GET['given_date'];
@@ -508,7 +508,7 @@ function getLeaveReport(){
 }
 
 function inoutReport(){
-	global $check_userid,$check_username,$from_date,$to_date,$inout_user,$cio_id,$cio_user,$cio_in_date,$cio_in_city,$cio_out_date,$cio_out_city;
+	global $check_userid,$check_username,$from_date,$to_date,$inout_user,$cio_id,$cio_user,$cio_in_date,$cio_in_city,$cio_out_date,$cio_out_city, $conn;
 	$cio_id=$check_userid=array();
 
 	include('config.php');

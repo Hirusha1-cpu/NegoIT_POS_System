@@ -132,7 +132,7 @@ if (isset($_REQUEST['message'])) {
 							<tr>
 								<td style="background-color:#467898; color:white;" class="shipmentTB4">Deleted Date</td>
 								<td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4">
-									<?php print substr($main_deleted_date, 0, 16); ?>
+									<?php print substr($main_deleted_date ?? '', 0, 16); ?>
 								</td>
 							</tr>
 							<tr>

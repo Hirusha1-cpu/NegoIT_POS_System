@@ -3482,9 +3482,9 @@ function getChqueNo($sub_system, $postpone)
 
 // updated by nirmal 08_04_2025 (get cheque number with payment id)
 // update by nirmal 23_05_2025 (add date for future 90 days)
-function getChqueNo($sub_system, $postpone)
+function getChqueNoa($sub_system, $postpone)
 {
-	global $py_chqnofull;
+	global $py_chqnofull,$conn2;
 	include('config.php');
 
 	// Calculate the last day of the previous month
@@ -4229,7 +4229,7 @@ function setChqRtnSts($status)
 //-----------------------------------------Postpone-------------------------------//
 function getPostponedChque($sub_system)
 {
-	global $chq0_id, $chq0_invno, $chq0_cuname, $chq0_amount, $chq0_no, $chq0_bank, $chq0_branch, $chq0_postponed_date, $chq0_paymentdate, $chq0_salesman, $chq0_date, $chq0_postpone, $chq0_code, $salesman_filter;
+	global $chq0_id, $chq0_invno, $chq0_cuname, $chq0_amount, $chq0_no, $chq0_bank, $chq0_branch, $chq0_postponed_date, $chq0_paymentdate, $chq0_salesman, $chq0_date, $chq0_postpone, $chq0_code, $salesman_filter, $conn;
 	if ($sub_system == 'all') {
 		$sub_system_qry = "";
 	} else {
@@ -5894,7 +5894,7 @@ function snListAll()
 // update by nirmal 22_11_2023
 function getShipmentList()
 {
-	global $sm_id, $sm_inv_date, $sm_inv_no, $su_name, $filter_shipno, $filter_invdate, $filter_invno, $filter_invsup, $sm_fully_paid;
+	global $sm_id, $sm_inv_date, $sm_inv_no, $su_name, $filter_shipno, $filter_invdate, $filter_invno, $filter_invsup, $sm_fully_paid,$conn2;
 	$systemid = inf_systemid(1);
 	$sub_system = $_COOKIE['sub_system'];
 	if (isset($_POST['ship_no'])) {
@@ -6573,7 +6573,7 @@ function deleteShipPayment()
 //-----------------------------Chques------------------------------------//
 function getBankAccounts()
 {
-	global $bnk_id, $bnk_name;
+	global $bnk_id, $bnk_name, $conn2;
 	include('config.php');
 	$query = "SELECT id,name FROM accounts WHERE bank_ac=1 AND `status`=1 ORDER BY name";
 	$result = mysqli_query($conn2, $query);
@@ -6586,7 +6586,7 @@ function getBankAccounts()
 // updated by nirmal 05_11_2024 (get user accepted cheques only)
 function chquePendingFinalyze()
 {
-	global $todate, $py_id2, $customer2, $payment_amount2, $chq_date2, $payment_date2, $payment_salesman2, $payment_store2, $cheque_no2, $cheque_name2;
+	global $todate, $py_id2, $customer2, $payment_amount2, $chq_date2, $payment_date2, $payment_salesman2, $payment_store2, $cheque_no2, $cheque_name2,$conn2;
 	$sub_system = $_COOKIE['sub_system'];
 	$py_id2 = $chq_date = $cheque_name2 = array();
 	$user_id = $_COOKIE['user_id'];
@@ -6708,7 +6708,7 @@ function getChqueData($sub_system)
 {
 	global $customer, $todate, $payment_amount, $chque_no, $chque_bnk_code, $chque_bnk_brn, $chq_date, $payment_date, $payment_salesman,
 		$payment_store, $chque_total, $py_id2, $customer2, $payment_amount2, $chq_date2, $invoice,
-		$payment_date2, $payment_salesman2, $payment_store2, $cheque_no2, $payment_sub_sys, $cheque_name2;
+		$payment_date2, $payment_salesman2, $payment_store2, $cheque_no2, $payment_sub_sys, $cheque_name2, $conn2;
 	$py_id2 = $chq_date = $cheque_name2 = array();
 	$sub_sys_filter = $sub_sys_fileter1 = '';
 	$user_id = $_COOKIE['user_id'];
@@ -7256,7 +7256,7 @@ function clearChque2()
 function getClearedChques()
 {
 	global $from_date, $to_date, $bnk, $py_date, $invoice, $chque_no, $chque_bnk_code, $chque_bnk_brn,
-		$chque_bnk_name, $chque_date, $cust, $deposit_date, $deposit_bnk, $salesman, $deposit_by, $amount, $payment_id;
+		$chque_bnk_name, $chque_date, $cust, $deposit_date, $deposit_bnk, $salesman, $deposit_by, $amount, $payment_id, $conn2;
 	$qry_bnk = $qry_date = $qry_year = $filter_year = '';
 	$py_date = $payment_id = array();
 	$sub_sys_qry = '';
@@ -7424,7 +7424,7 @@ function getChqueRange($sub_system)
 //-----------------------------------Authorize Code-------------------------------------//
 function getAuthorizeCodelist()
 {
-	global $tmp_bm_no_list, $tmp_code_list, $tmp_inv_total, $invoice_no_list, $code_list, $inv_total;
+	global $tmp_bm_no_list, $tmp_code_list, $tmp_inv_total, $invoice_no_list, $code_list, $inv_total, $conn2;
 	$tmp_bm_no_list = $tmp_code_list = $invoice_no_list = $code_list = array();
 	$sub_system = $_COOKIE['sub_system'];
 	include('config.php');
@@ -7483,7 +7483,7 @@ function getSubSystems()
 
 function getSubSystems2()
 {
-	global $sub_system_list, $sub_system_names;
+	global $sub_system_list, $sub_system_names, $conn2;
 	include('config.php');
 	$query = "SELECT id,name FROM sub_system WHERE `status`=1";
 	$result = mysqli_query($conn2, $query);
@@ -7542,7 +7542,7 @@ function getPaySubStatus($status_id)
 
 function getPaymentData($sub_system)
 {
-	global $bm_total, $py_total, $last_id, $last_amount, $last_submited_by, $last_submited_date, $last_processed_by, $last_processed_date, $last_status, $pending_id, $pending_amount, $pending_submited_by, $pending_submited_date, $pending_submited_time, $cheque_py_id, $cheque_no, $cheque_amount;
+	global $bm_total, $py_total, $last_id, $last_amount, $last_submited_by, $last_submited_date, $last_processed_by, $last_processed_date, $last_status, $pending_id, $pending_amount, $pending_submited_by, $pending_submited_date, $pending_submited_time, $cheque_py_id, $cheque_no, $cheque_amount, $conn2;
 	$cheque_py_id = $last_id = $pending_id = array();
 	include('config.php');
 	$query = "SELECT SUM(bi.qty * bi.unit_price) FROM bill_main bm, bill bi WHERE bm.invoice_no=bi.invoice_no AND bm.`status` NOT IN (0,7) AND bm.`lock`=1 AND bm.exclude=0 AND bm.sub_system='$sub_system'";
@@ -7716,7 +7716,7 @@ function getOnePayment()
 
 function getBank2()
 {
-	global $bank_id, $bank_code, $bank_name;
+	global $bank_id, $bank_code, $bank_name, $conn2;
 	include('config.php');
 	$query = "SELECT id,bank_code,name FROM bank WHERE `status`='1'";
 	$result = mysqli_query($conn2, $query);
@@ -7729,7 +7729,7 @@ function getBank2()
 
 function getPaymentHistory($sub_system)
 {
-	global $from_date, $to_date, $payment_id, $ps_amount, $ps_type, $ps_chque_no, $ps_chque_bank, $ps_chque_branch, $ps_chque_date, $ps_chque_return_date, $ps_submited_by, $ps_submited_date, $ps_processed_by, $ps_processed_date, $ps_status, $ps_status_code, $ps_cust_chq, $balance_before_from, $balance_within_period, $balance_after_to, $store_company;
+	global $from_date, $to_date, $payment_id, $ps_amount, $ps_type, $ps_chque_no, $ps_chque_bank, $ps_chque_branch, $ps_chque_date, $ps_chque_return_date, $ps_submited_by, $ps_submited_date, $ps_processed_by, $ps_processed_date, $ps_status, $ps_status_code, $ps_cust_chq, $balance_before_from, $balance_within_period, $balance_after_to, $store_company, $conn2;
 	$store = $_COOKIE['store'];
 	$balance_before_from = $balance_within_period = $balance_after_to = 0;
 	if (isset($_GET['from_date']) && isset($_GET['to_date'])) {
@@ -8993,7 +8993,7 @@ function deleteBillPayment()
 //-----------------------Qty MGMT---------------------------------//
 function getQtyMgmt()
 {
-	global $item_id0, $item_id, $code, $description, $code1, $description1, $approve_edit, $inv_id, $inv_qty, $inv_wprice, $inv_rprice, $inv_cprice, $inn_id, $inn_qty, $inn_wprice, $inn_rprice, $inn_cprice;
+	global $item_id0, $item_id, $code, $description, $code1, $description1, $approve_edit, $inv_id, $inv_qty, $inv_wprice, $inv_rprice, $inv_cprice, $inn_id, $inn_qty, $inn_wprice, $inn_rprice, $inn_cprice, $conn2;
 	$store = $_COOKIE['store'];
 	$approve_edit = false;
 	$inn_id = array();
@@ -9586,7 +9586,7 @@ function getDetailTaxReport($sub_system)
 // added by nirmal 08_07_2024
 function getStoreSettings($sub_system)
 {
-	global $store_settings_store_id, $store_settings_store_name, $store_settings_store_sub_system, $store_setting_store_p_u;
+	global $store_settings_store_id, $store_settings_store_name, $store_settings_store_sub_system, $store_setting_store_p_u, $conn2;
 	$store_settings_store_id = $store_settings_store_name = $store_settings_store_sub_system = $store_setting_store_p_u = array();
 
 	include('config.php');

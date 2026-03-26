@@ -1609,6 +1609,7 @@ function getDecimalPlaces($method)
 // added by nirmal 14_08_2023
 function isProfitReportActive()
 {
+	global $conn2;
 	if (isset($_SESSION['profit_report_active'])) {
 		return $_SESSION['profit_report_active'];
 	} else {
@@ -1901,6 +1902,7 @@ function emptyBillDelete($salesman, $module)
 // updated by nirmal 08_07_2024
 function isBillingPriceUnderValueActive($method)
 {
+	global $conn2;
 	if ($method == 1)
 		include('config.php');
 	if ($method == 2)
@@ -1919,6 +1921,7 @@ function isBillingPriceUnderValueActive($method)
 // added by nirmal 03_01_2024
 function isCustomerTotalOutstandingShowInBill($method)
 {
+	global $conn2;
 	if (isset($_SESSION['is_customer_total_outstanding_show_in_bill'])) {
 		return $_SESSION['is_customer_total_outstanding_show_in_bill'];
 	} else {
@@ -4595,6 +4598,7 @@ function sendPaymentSMS($payment_id, $cust, $amount)
 // added by nirmal 17_02_2025
 function getTaxRate()
 {
+	global $conn2, $conn;
 	if (isset($_SESSION['tax_rate'])) {
 		return $_SESSION['tax_rate'];
 	} else {
@@ -4617,6 +4621,7 @@ function getTaxRate()
 // added by nirmal 17_03_2025
 function isTimeShow()
 {
+	global $conn2;
 	if (isset($_SESSION['time_show'])) {
 		return $_SESSION['time_show'];
 	} else {

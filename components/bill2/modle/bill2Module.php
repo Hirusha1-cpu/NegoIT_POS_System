@@ -165,9 +165,9 @@ function setHPstatus($invoice_no)
 		return false;
 }
 
-function listSN($sub_system)
-{
-	global $data_list, $fn;
+function listSNa($sub_system)
+{	
+	global $data_list, $fn, $conn;
 	$data_list = array();
 	if ($_POST['keyword']) {
 		$keyword = str_replace("'", "", $_POST['keyword']);
@@ -415,6 +415,7 @@ function moreItem($sub_system, $systemid)
 // update by nirmal 14_07_2024 (remove already billed sn get again when adding new items)
 function getSNList($sub_system, $systemid)
 {
+	global $conn;
 	$bm_no = $_GET['bm_no'];
 	$itm_id = $_GET['itm_id'];
 	if (isset($_COOKIE['district']))
@@ -852,6 +853,7 @@ function validateBillItem($sub_system)
 // updated by nirmal 26_06_2025 (GROUP BY CASE WHEN itm.unic = 1 THEN bi.id ELSE itm.id END, added)
 function validateTMPBill($case)
 {
+	global $conn;
 	$bm_no = $_GET['bm_no'];
 	$user_id = $_COOKIE['user_id'];
 	$unic_cal = unicCal();
@@ -860,9 +862,26 @@ function validateTMPBill($case)
 	include('config.php');
 	$systemid = inf_systemid(1);
 
-	$query = "SELECT bi.id,bm.sys_user,bm.billed_by,bm.mapped_inventory,itm.id,itm.unic,GROUP_CONCAT(bi.`comment` SEPARATOR ','),sum(bi.qty),bi.new_inv_ref,bm.cust,itm.pr_sr
-	FROM bill_main_tmp bm, bill_tmp bi, inventory_items itm
-	WHERE bm.bm_no=bi.bm_no AND bi.item=itm.id AND bm.bm_no='$bm_no' GROUP BY CASE WHEN itm.unic = 1 THEN bi.id ELSE itm.id END, bi.new_inv_ref";
+	// $query = "SELECT bi.id,bm.sys_user,bm.billed_by,bm.mapped_inventory,itm.id,itm.unic,GROUP_CONCAT(bi.`comment` SEPARATOR ','),sum(bi.qty),bi.new_inv_ref,bm.cust,itm.pr_sr
+	// FROM bill_main_tmp bm, bill_tmp bi, inventory_items itm
+	// WHERE bm.bm_no=bi.bm_no AND bi.item=itm.id AND bm.bm_no='$bm_no' GROUP BY CASE WHEN itm.unic = 1 THEN bi.id ELSE itm.id END, bi.new_inv_ref";
+	$query = "SELECT bi.id, 
+                 bm.sys_user, 
+                 bm.billed_by, 
+                 bm.mapped_inventory, 
+                 itm.id as item_id, 
+                 itm.unic, 
+                 GROUP_CONCAT(bi.`comment` SEPARATOR ',') as comments, 
+                 SUM(bi.qty) as total_qty, 
+                 bi.new_inv_ref, 
+                 bm.cust, 
+                 itm.pr_sr
+          FROM bill_main_tmp bm 
+          INNER JOIN bill_tmp bi ON bm.bm_no = bi.bm_no 
+          INNER JOIN inventory_items itm ON bi.item = itm.id 
+          WHERE bm.bm_no = '$bm_no' 
+          GROUP BY bi.id, bm.sys_user, bm.billed_by, bm.mapped_inventory, 
+                   itm.id, itm.unic, bi.new_inv_ref, bm.cust, itm.pr_sr";
 	$result = mysqli_query($conn, $query);
 	while ($row = mysqli_fetch_array($result)) {
 		$bi_id = $row[0];
@@ -1039,6 +1058,7 @@ function calculateDiscount($cust, $itemid, $price, $discount_value, $discount_ty
 
 function addToBill($sub_system)
 {
+	error_log("qty: " . $_GET['qty']);
 	global $conn2, $conn;
 	$user_store = $_COOKIE['store'];
 	$system_user = $_COOKIE['user_id'];
@@ -1128,9 +1148,11 @@ function addToBill($sub_system)
 		$row1 = mysqli_fetch_row(mysqli_query($conn, $query1));
 		$purchased_qty = ($row1[0] !== null) ? (int) $row1[0] : 0;
 		if ($systemid != 17 && $systemid != 1) {
-			if (!(($row1[0] !== null) && ($row1[0] >= -$qty))) {
+			if ((($row1[0] !== null) && ($row1[0] >= -$qty))) {
 				$out = false;
-				$message = 'Error: This customer did not purchase this item or purchased less quantity (purchased qty : ' . $purchased_qty . ')';
+				error_log("Debug: Validation failed for return quantity. Purchased qty");
+				$message = 'Error: This customer did not purchase this item or purchased less quantityd (purchased qty : ' . $purchased_qty . ')';
+				error_log("Debug: Error message: $message");
 			}
 		}
 
@@ -1833,6 +1855,7 @@ function hpFormData()
 
 function processInventoryNew($item, $lastitem, $store, $table)
 {
+	global $conn;
 	$nt_id = $itq_qty = '';
 	include('config.php');
 	$query = "SELECT id,item,w_price,r_price,c_price,qty FROM inventory_qty WHERE location='$store' AND item='$item'";
@@ -1945,6 +1968,7 @@ function updateDueDate($sub_system)
 
 function createInvoice($sub_system)
 {
+	global $conn;
 	include('config.php');
 	$user_store = isset($_COOKIE['store']) ? mysqli_real_escape_string($conn, $_COOKIE['store']) : '';
 	$bm_no = isset($_GET['bm_no']) ? mysqli_real_escape_string($conn, $_GET['bm_no']) : '';
@@ -3649,6 +3673,7 @@ function getMasterCust($cust)
 
 function validateInvoice()
 {
+	global $conn;
 	$invoice_no = $_GET['invoice_no'];
 	$cust = $_GET['cust'];
 	include('config.php');
@@ -3672,7 +3697,7 @@ function validateInvoice()
 // updated by nirmal 03_11_2023
 function generalPrint()
 {
-	global $print_time, $key_dev_name, $tm_web, $tm_email, $trn_no;
+	global $print_time, $key_dev_name, $tm_web, $tm_email, $trn_no, $conn;
 	$key_dev_name = '';
 
 	$isMobile = isMobile();
@@ -3727,7 +3752,7 @@ function generateInvoice($order_by)
 	$up_mobile, $bm_status, $bm_quotation_no, $qm_warranty, $qm_terms, $qm_po, $bm_packed_by, $tm_shop, $bm_print_st,
 	$bm_bocom_type, $bm_bocom, $bi_repair_sn, $up_packedby, $pay_type, $bi_return_odr, $return_odr, $bill_cross_tr,
 	$hire_purchase, $hp_type, $hp_amount, $hp_schedule, $hp_schedule_remark, $hp_pay_id, $card_amount, $pay_pro_fee, $card_full_data, $decimal, $tax, $tax_added_value,
-	$cust_tax_no, $sub_total, $credit_balance, $logo, $bm_discount, $quotation_advance_payment;
+	$cust_tax_no, $sub_total, $credit_balance, $logo, $bm_discount, $quotation_advance_payment, $conn2;
 
 	$invoice_no = $_REQUEST['id'];
 	$chq0_no = $chq0_bnk = $chq0_branch = $bm_packed_by = '';
@@ -4044,6 +4069,7 @@ function generateInvoice($order_by)
 // added by nirmal 06_02_2024
 function getBillStore($invoice_no)
 {
+	global $conn;
 	include('config.php');
 	$query = "SELECT `store` FROM bill_main WHERE `invoice_no`='$invoice_no'";
 	$row = mysqli_fetch_row(mysqli_query($conn, $query));
@@ -4217,6 +4243,7 @@ function generateInvoiceFast()
 
 function billDeletePermission($invoice_no)
 {
+	global $conn;
 	include('config.php');
 	$user = $_COOKIE['user_id'];
 	$store = $_COOKIE['store'];
@@ -4244,7 +4271,7 @@ function billDeletePermission($invoice_no)
 // update by nirmal 02_10_2025 cust order new status added
 function billPermission()
 {
-	global $billpermission, $bm_status, $bm_lock, $bm_type, $bm_cust, $status_out, $status_color;
+	global $billpermission, $bm_status, $bm_lock, $bm_type, $bm_cust, $status_out, $status_color, $conn;
 	$invoice_no = $_REQUEST['id'];
 	$billpermission = billDeletePermission($invoice_no);
 
@@ -4328,7 +4355,7 @@ function billDetails()
 	$main_ordered_date, $main_billed_date, $main_billed_by, $main_billed_by_id, $main_sys_user, $main_recovery_agent,
 	$main_packed_date, $main_packed_by, $main_shipped_date, $main_shipped_by, $main_deliverd_date, $main_deliverd_by,
 	$main_deleted_date, $main_deleted_by, $main_total, $main_comment1, $main_comment2, $main_comment_pay, $main_sub_system_id,
-	$sms_resend, $main_refinvid, $main_tracking_id, $hire_purchase, $hp_cal_start_date, $main_cust_id;
+	$sms_resend, $main_refinvid, $main_tracking_id, $hire_purchase, $hp_cal_start_date, $main_cust_id, $conn2, $conn;
 
 	$invoice_no = $_GET['id'];
 	$today = dateNow();
@@ -4435,7 +4462,7 @@ function getRepView($sub_system, $systemid)
 
 function billTemplate()
 {
-	global $tm_shopname, $tm_template, $tm_address1, $tm_tel1;
+	global $tm_shopname, $tm_template, $tm_address1, $tm_tel1, $conn;
 	$store = $_COOKIE['store'];
 	include('config.php');
 	$result = mysqli_query($conn, "SELECT shop_name,billing_template,address,tel FROM stores WHERE id='$store'");
@@ -6053,7 +6080,7 @@ function getCreditStatus2($cust)
 // updated by nirmal 21_12_24
 function getCreditOutstanding2($cust, $invoice_no)
 {
-	global $qo_no;
+	global $qo_no, $conn;
 	$total_oust = $invoice_oust = 0;
 	$jasonArray = array();
 
@@ -6140,7 +6167,7 @@ function calculateTotal()
 // update by nirmal 25_12_2023
 function searchBill($id)
 {
-	global $cust_id, $cust_name;
+	global $cust_id, $cust_name, $conn;
 	$id = ltrim($id, '0');
 	include('config.php');
 	$query = "SELECT count(invoice_no) FROM bill_main WHERE invoice_no='$id'";
@@ -6858,7 +6885,7 @@ function getCust($status)
 // update by nirmal 21_12_23
 function getCustPayments()
 {
-	global $payment_id, $payment_type, $payment_amount, $payment_chq_date, $payment_chq_return, $payment_date, $full_data, $pay_color;
+	global $payment_id, $payment_type, $payment_amount, $payment_chq_date, $payment_chq_return, $payment_date, $full_data, $pay_color, $conn2;
 	$cust0 = $_REQUEST['cust'];
 	$sub_system = $_COOKIE['sub_system'];
 	$i = 0;
@@ -6915,7 +6942,7 @@ function getCustPayments()
 // added by nirmal 09_07_2025
 function getCustQuotationNumbers($cust)
 {
-	global $quotation_numbers;
+	global $quotation_numbers, $conn2;
 	$quotation_numbers = [];
 	include('config.php');
 
@@ -6954,7 +6981,7 @@ function getBank()
 // added by nirmal 06_11_2024
 function getChequeNames()
 {
-	global $cheque_name_id, $cheque_name;
+	global $cheque_name_id, $cheque_name,$conn2;
 	$cheque_name_id = $cheque_name = [];
 	include('config.php');
 
@@ -7031,6 +7058,7 @@ function hpInstalmentFormData()
 
 function addBillPayment($sub_system)
 {
+	global $conn;
 	include('config.php');
 	$sys_user = $_COOKIE['user_id'];
 	$store = $_COOKIE['store'];
@@ -7591,7 +7619,7 @@ function addBillPayment($sub_system)
 
 function getInvoicePay()
 {
-	global $invoice_no, $bm_cust_id, $bm_cust, $py_id, $py_date, $py_hp_inst_date, $py_amount, $py_type, $bill_total, $bill_payment, $print_time, $bm_date_time, $tm_shop, $tm_company, $tm_address, $tm_tel, $tm_web, $tm_email;
+	global $invoice_no, $bm_cust_id, $bm_cust, $py_id, $py_date, $py_hp_inst_date, $py_amount, $py_type, $bill_total, $bill_payment, $print_time, $bm_date_time, $tm_shop, $tm_company, $tm_address, $tm_tel, $tm_web, $tm_email, $conn, $conn2;
 	$py_id = array();
 	$print_time = timeNow();
 	if (isset($_GET['invoice_no'])) {
@@ -8505,6 +8533,7 @@ function hpGetPaidInstalment()
 
 function setStatusCrossTrans($invoice_no, $st)
 {
+	global $conn;
 	$user_id = $_COOKIE['user_id'];
 	include('config.php');
 	$query = "UPDATE transfer_main SET `status`='$st' WHERE invoice_no='$invoice_no' AND `user`='$user_id'";
@@ -8520,7 +8549,7 @@ function generatePayment()
 	global $tm_shop, $tm_company, $tm_address, $tm_tel, $payment_id, $cust_id, $cust_name, $payment_type, $amount,
 	$chque_no, $chque_bank, $chque_bank_code, $chque_branch, $chque_date, $salesman, $payment_date, $invoice_no, $comment,
 	$payment_type_n, $bank_trans, $cu_mobile, $cu_nic, $print_time, $cu_details, $payment_time, $cust_st, $total_oust, $invoice_oust,
-	$card_no, $pay_pro_fee, $credit_balance;
+	$card_no, $pay_pro_fee, $credit_balance, $conn, $conn2;
 	$payment_id = $_REQUEST['id'];
 	$systemid = inf_systemid(2);
 	$user_name_column = 'up.username';
@@ -8603,7 +8632,7 @@ function generatePayment()
 // edit by nirmal 29_01_2024 get cust id to get credit balance of customer
 function payDetails()
 {
-	global $main_sub_system, $main_store, $main_paid_date, $main_paid_by, $main_sys_user, $main_deleted_date, $main_deleted_by, $main_sub_system_id, $main_sms, $sms_resend, $main_cust_id;
+	global $main_sub_system, $main_store, $main_paid_date, $main_paid_by, $main_sys_user, $main_deleted_date, $main_deleted_by, $main_sub_system_id, $main_sms, $sms_resend, $main_cust_id, $conn;
 	$pay_no = $_GET['id'];
 	$sms_resend = 0;
 	include('config.php');
@@ -8641,6 +8670,7 @@ function payDetails()
 // updated by nirmal 30_01_2025 (added payment delete permission if status 2)
 function paymentDeletePermission($payment_no)
 {
+	global $conn;
 	include('config.php');
 	$user = $_COOKIE['user_id'];
 	$store = $_COOKIE['store'];
@@ -8668,7 +8698,7 @@ function paymentDeletePermission($payment_no)
 // updated by nirmal 30_01_2025 (added payment delete permission if status 2)
 function paymentPermission()
 {
-	global $paymentpermission, $py_status, $status_out, $status_color;
+	global $paymentpermission, $py_status, $status_out, $status_color, $conn;
 	$payment_no = $_REQUEST['id'];
 	$paymentpermission = paymentDeletePermission($payment_no);
 	include('config.php');
@@ -9359,7 +9389,7 @@ function deletePayment($n, $force)
 //--------------------------------------Item Return----------------------------//
 function getReturnItems()
 {
-	global $rt_id, $rt_itmdesc, $rt_qty, $rt_no_update;
+	global $rt_id, $rt_itmdesc, $rt_qty, $rt_no_update, $conn;
 	$rt_id = $rt_itmdesc = $rt_qty = $rt_no_update = array();
 	if (isset($_REQUEST['id'])) {
 		$rtninvoice_no = $_REQUEST['id'];
@@ -9377,7 +9407,7 @@ function getReturnItems()
 
 function newReturn($cust0, $gps_x, $gps_y)
 {
-	global $cust, $invoice_no, $message;
+	global $cust, $invoice_no, $message, $conn;
 	$store = $_COOKIE['store'];
 	$sub_system = $_COOKIE['sub_system'];
 	$user_id = $_COOKIE['user_id'];
@@ -9853,7 +9883,7 @@ function deleteReturn()
 // update by nirmal 07_02_2024 (get store addresses instead of mapped store address to system==1 and sub_system==0 or 2)
 function generateRtnInvoice()
 {
-	global $tm_shop, $tm_company, $tm_address, $tm_tel, $return_invoice_no, $bill_id, $bill_date, $bill_salesman, $bill_item, $bill_qty, $bill_custid, $bill_cust, $extra_pay;
+	global $tm_shop, $tm_company, $tm_address, $tm_tel, $return_invoice_no, $bill_id, $bill_date, $bill_salesman, $bill_item, $bill_qty, $bill_custid, $bill_cust, $extra_pay, $conn;
 	$return_invoice_no = $_REQUEST['id'];
 	$isMobile = isMobile();
 	if ($isMobile) {
@@ -10065,6 +10095,7 @@ function searchPayments()
 
 function returnPermission($invoice_no)
 {
+	global $conn;
 	$user = $_COOKIE['user_id'];
 	$today = dateNow();
 	include('config.php');
@@ -10084,9 +10115,9 @@ function returnPermission($invoice_no)
 	return $billpermission;
 }
 
-function returnDetails()
+function returnDetailsa()
 {
-	global $billpermission, $rm_status, $rm_cust, $status_out, $status_color, $main_sub_system, $main_store, $main_refinv, $main_returned_date, $main_returned_by, $main_process, $main_deleted_date, $main_deleted_by;
+	global $billpermission, $rm_status, $rm_cust, $status_out, $status_color, $main_sub_system, $main_store, $main_refinv, $main_returned_date, $main_returned_by, $main_process, $main_deleted_date, $main_deleted_by, $conn;
 	$invoice_no = $_GET['id'];
 	$user = $_COOKIE['user_id'];
 	$store = $_COOKIE['store'];

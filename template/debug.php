@@ -1,6 +1,7 @@
 <?php
 function debugStart($debug_input1, $debug_input2)
 {
+	global $conn;
 	$debug_proceed = false;
 	$debug_timezone = 5.5;
 	$debug_id = 0;
@@ -626,6 +627,7 @@ function debugStart($debug_input1, $debug_input2)
 // update by nirmal 07_02_2024 (get store based on debug_id instead of COOKIE store)
 function debugEnd($debug_id, $debug_status, $action_id = null)
 {
+	global $conn;
 	$debug_actionqry = "";
 	include('config.php');
 	if ($debug_id != 0) {

@@ -248,7 +248,7 @@
         <tr>
             <td align="center" style="" class="shipmentTB4"><?php print $code; ?></td>
             <td align="right" style="" class="shipmentTB4"><?php print number_format($w_price,$decimal); ?></td>
-            <td align="right" style="" class="shipmentTB4"><?php print number_format($r_price,$decimal); ?></td>
+            <td align="right" style="" class="shipmentTB4"><?php print number_format($r_price ?? 0,$decimal ?? 2); ?></td>
             <td align="right" style="" class="shipmentTB4"><?php print number_format($c_price,$decimal); ?></td>
             <td align="center" style="" class="shipmentTB4"><?php print $drawer; ?></td>
         </tr>

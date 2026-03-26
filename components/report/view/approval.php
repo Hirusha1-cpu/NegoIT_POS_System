@@ -10,7 +10,6 @@
 	print '<span style="color:'.$color.'; font-weight:bold;">'.$_REQUEST['message'].'</span>'; 
 	}
 ?></td></tr></table>
-
 	<table align="center" style="font-family:Calibri" >
 	<tr><td colspan="7" align="center" style="font-size:14pt; color:navy; font-weight:bold">Pending Loan Approval</td></tr>
 	<tr style="background-color:#467898;color :white;" ><th class="shipmentTB3">Employee</th><th class="shipmentTB3">Loan Amount</th><th class="shipmentTB3">Duration</th><th class="shipmentTB3">Start Date</th><th class="shipmentTB3">End Date</th><th class="shipmentTB3">Paid Off Amount</th><th class="shipmentTB3">Action</th></tr>

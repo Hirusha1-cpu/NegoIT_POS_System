@@ -153,7 +153,8 @@ if (isset($_REQUEST['message'])) {
 					<table align="center">
 						<tr bgcolor="#EEEEEE">
 							<td class="shipmentTB1">Shipment No</td>
-							<td class="shipmentTB2"><?php print str_pad($sm1_id, 7, "0", STR_PAD_LEFT); ?></td>
+							<!-- <td class="shipmentTB2"><?php print str_pad($sm1_id, 7, "0", STR_PAD_LEFT); ?></td> -->
+							 <td class="shipmentTB2"><?php print str_pad($sm1_id ?? '', 7, "0", STR_PAD_LEFT); ?></td>
 						</tr>
 						<tr bgcolor="#EEEEEE">
 							<td class="shipmentTB1">Shipment Date</td>

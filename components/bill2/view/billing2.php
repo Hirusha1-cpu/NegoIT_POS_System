@@ -415,7 +415,6 @@ $default_discount_type = $_COOKIE['default_discount'];
 			$msg = '<span style="color:orange; font-weight:bold; font-size:12pt;">Please Select an Item</span>';
 			$out = false;
 		}
-
 		if ($itm_unic == '1') {
 			$itu_list_tmp = document.getElementById("itu_list_tmp").value;
 			$itu_list_tmp = $itu_list_tmp.slice(0, -1);
@@ -1347,7 +1346,7 @@ if (isset($_REQUEST['message'])) {
 					<!-- Cash Back Invoice  -->
 					<tr>
 						<td width="50px"></td>
-						<td style="font-size:12pt">Cash Back Invoice</td>
+						<td style="font-size:12pt">Cash Back Invoicev</td>
 						<td colspan="2">
 							<input id="cashback" type="checkbox" onchange="cashbackToggle()" <?php if (isset($_GET['cashback'])) {
 								if ($_GET['cashback'] == 1)

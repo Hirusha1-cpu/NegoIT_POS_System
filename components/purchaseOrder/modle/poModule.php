@@ -40,7 +40,7 @@ function getStore($sub_system)
 
 function getGroup()
 {
-	global $group_id, $group_name;
+	global $group_id, $group_name, $conn;
 	$group_id = $group_name = array();
 	include('config.php');
 	$query = "SELECT group_id,group_name FROM store_group_main";
@@ -746,7 +746,7 @@ function addItemPO($sub_system)
 // updated by nirmal 07_11_2023
 function listPO($limit, $sub_system)
 {
-	global $po_number, $po_sup, $po_date, $po_status, $po_cost, $po_status1, $po_color, $po_submited_date;
+	global $po_number, $po_sup, $po_date, $po_status, $po_cost, $po_status1, $po_color, $po_submited_date, $conn;
 	$po_number = array();
 	$systemid = inf_systemid(1);
 	include('config.php');

@@ -156,9 +156,13 @@ function getItems($sub_system,$systemid){ // category dropdown select results
 				// if($row1[0]>0) $wprice=$row1[1]/$row1[0]; else $wprice=0;
 				// if($row1[0]>0) $rprice=$row1[2]/$row1[0]; else $rprice=0;
 
-				$query3 = "SELECT COUNT(iui.id),iui.w_price, iui.r_price, iui.c_price
-				FROM inventory_unic_item iui WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
-				GROUP BY iui.w_price, iui.r_price";
+				// $query3 = "SELECT COUNT(iui.id),iui.w_price, iui.r_price, iui.c_price
+				// FROM inventory_unic_item iui WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
+				// GROUP BY iui.w_price, iui.r_price";
+				$query3 = "SELECT COUNT(iui.id), iui.w_price, iui.r_price, iui.c_price
+           FROM inventory_unic_item iui 
+           WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
+           GROUP BY iui.w_price, iui.r_price, iui.c_price";
 				$result3=mysqli_query($conn2,$query3);
 				while($row3=mysqli_fetch_array($result3)){
 					$id[]=$row[0];
@@ -457,7 +461,7 @@ function getItems($sub_system,$systemid){ // category dropdown select results
 // update by nirmal 2024_07_14 (for sysid==24 show only logged user store item qty, which omits subsystem store with their qty)
 // update by nirmal 2024_07_30 (for get unic items sets group by prices)
 function checkItem($sub_system){ // item code or desc search results
-	global $store_name,$item_w_price,$item_r_price,$item_qty,$search_code,$search_description,$item_dr,$decimal;
+	global $store_name,$item_w_price,$item_r_price,$item_qty,$search_code,$search_description,$item_dr,$decimal, $conn, $conn2;
 	$sp_item=$sp_increment=$sp_category=$sp_catincrement=$store_name=array();
 	$user_id=$_COOKIE['user_id'];
 	$district=$_COOKIE['district'];
@@ -512,7 +516,20 @@ function checkItem($sub_system){ // item code or desc search results
 		}
 
 		if($search_code!=''){
-			$query="SELECT rp.`drawer_no`,itm.default_price,SUM(if(rpi.qty>0, 1, 100000)) FROM inventory_items itm, item_category itc, repair_parts_map rm, repair_parts_inventory rpi, repair_parts rp WHERE rm.repair_part=rpi.part AND itm.id=rm.inv_item AND itm.category=itc.id AND rp.id=rpi.part AND rpi.location='$store' AND itm.pr_sr=3 AND itm.`status`=1 AND rp.`status`=1 AND itm.code='$search_code' GROUP BY itm.id";
+			// $query="SELECT rp.`drawer_no`,itm.default_price,SUM(if(rpi.qty>0, 1, 100000)) FROM inventory_items itm, item_category itc, repair_parts_map rm, repair_parts_inventory rpi, repair_parts rp WHERE rm.repair_part=rpi.part AND itm.id=rm.inv_item AND itm.category=itc.id AND rp.id=rpi.part AND rpi.location='$store' AND itm.pr_sr=3 AND itm.`status`=1 AND rp.`status`=1 AND itm.code='$search_code' GROUP BY itm.id";
+			$query = "SELECT rp.`drawer_no`, itm.default_price, SUM(if(rpi.qty>0, 1, 100000)) 
+          FROM inventory_items itm, item_category itc, repair_parts_map rm, 
+               repair_parts_inventory rpi, repair_parts rp 
+          WHERE rm.repair_part = rpi.part 
+            AND itm.id = rm.inv_item 
+            AND itm.category = itc.id 
+            AND rp.id = rpi.part 
+            AND rpi.location = '$store' 
+            AND itm.pr_sr = 3 
+            AND itm.`status` = 1 
+            AND rp.`status` = 1 
+            AND itm.code = '$search_code' 
+          GROUP BY itm.id, rp.drawer_no, itm.default_price";
 			$result=mysqli_query($conn2,$query);
 			while($row=mysqli_fetch_array($result)){
 				$store_name[]='Current Store';
@@ -552,9 +569,13 @@ function checkItem($sub_system){ // item code or desc search results
 				if($sp_catincrement!='') $catspecialrate=true;
 
 				if(($unic_cal)&&($unic==1)){
-					$query3 = "SELECT COUNT(iui.id),iui.w_price, iui.r_price, iui.c_price
-					FROM inventory_unic_item iui WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
-					GROUP BY iui.w_price";
+					// $query3 = "SELECT COUNT(iui.id),iui.w_price, iui.r_price, iui.c_price
+					// FROM inventory_unic_item iui WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
+					// GROUP BY iui.w_price";
+					$query3 = "SELECT COUNT(iui.id), iui.w_price, iui.r_price, iui.c_price
+           FROM inventory_unic_item iui 
+           WHERE iui.itq_id = '$itq_id' AND iui.status = '0'
+           GROUP BY iui.w_price, iui.r_price, iui.c_price";
 					$result3=mysqli_query($conn2,$query3);
 					while($row3=mysqli_fetch_array($result3)){
 						$item_dr[]=$row[6];

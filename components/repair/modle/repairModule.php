@@ -476,7 +476,7 @@ function updatePrice(){
 }
 
 function getRepairComments(){
-	global $rc_id,$rc_type,$rc_private_public,$rc_time,$rc_user,$rc_comment,$rc_user_id;
+	global $rc_id,$rc_type,$rc_private_public,$rc_time,$rc_user,$rc_comment,$rc_user_id, $conn;
 	$bm_inv=$_GET['id'];
 	$rc_id=array();
 	include('config.php');

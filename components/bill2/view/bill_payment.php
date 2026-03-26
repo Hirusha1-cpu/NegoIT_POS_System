@@ -946,7 +946,7 @@ else
 				<tr>
 					<td class="sidetable1">Bill Amount</td>
 					<td width="70px" align="right" class="sidetable2">
-						<?php print number_format($bill_total, $decimal); ?><input type="hidden" id="invoicetotal"
+						<?php print number_format($bill_total ?? 0, $decimal); ?><input type="hidden" id="invoicetotal"
 							value="<?php print $bill_total; ?>" />
 					</td>
 				</tr>
@@ -992,7 +992,7 @@ else
 					<td class="sidetable1">Balance</td>
 					<td align="right" class="sidetable2">
 						<div id="payment_balance_div">
-							<?php print number_format($bill_total, $decimal); ?>
+							<?php print number_format($bill_total ?? 0, $decimal); ?>
 						</div>
 						<input type="hidden" id="balance" value="<?php print $bill_total; ?>" />
 					</td>

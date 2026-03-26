@@ -67,7 +67,8 @@
 					</tr>
 					<tr>
 						<td style="background-color:#467898; color:white;" class="shipmentTB4">Returned Date</td>
-						<td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print substr($main_returned_date,0,16); ?></td>
+						<!-- <td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print substr($main_returned_date,0,16); ?></td> -->
+						 <td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print isset($main_returned_date) ? substr($main_returned_date,0,16) : ''; ?></td>
 					</tr>
 					<tr>
 						<td style="background-color:#467898; color:white;" class="shipmentTB4">Returned By</td>
@@ -79,7 +80,8 @@
 					</tr>
 					<tr>
 						<td style="background-color:#467898; color:white;" class="shipmentTB4">Deleted Date</td>
-						<td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print substr($main_deleted_date,0,16); ?></td>
+						<!-- <td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print substr($main_deleted_date,0,16); ?></td> -->
+						 <td style="background-color:#DDDDDD; color:maroon;" class="shipmentTB4"><?php print isset($main_deleted_date) ? substr($main_deleted_date,0,16) : ''; ?></td>
 					</tr>
 					<tr>
 						<td style="background-color:#467898; color:white;" class="shipmentTB4">Deleted By</td>

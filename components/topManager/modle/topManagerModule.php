@@ -24,7 +24,7 @@ function getPaySubStatus($status_id){
 }
 
 function getPaymentData(){
-	global $sub_sys_id,$sub_sys_name,$sub_sys_pending,$last_id,$last_amount,$last_submited_by,$last_submited_date,$last_processed_by,$last_processed_date,$last_status,$last_system,$pending_id,$pending_amount,$pending_submited_by,$pending_submited_date,$pending_submited_time,$pending_submited_system,$cheque_py_id,$cheque_no,$cheque_amount;
+	global $sub_sys_id,$sub_sys_name,$sub_sys_pending,$last_id,$last_amount,$last_submited_by,$last_submited_date,$last_processed_by,$last_processed_date,$last_status,$last_system,$pending_id,$pending_amount,$pending_submited_by,$pending_submited_date,$pending_submited_time,$pending_submited_system,$cheque_py_id,$cheque_no,$cheque_amount, $conn;
 	
 	include('config.php');
 	$query1="SELECT id,name FROM sub_system WHERE `status`=1 AND id!=0";
@@ -100,7 +100,7 @@ global $payment_id,$ps_amount,$ps_type,$ps_chque_no,$ps_chque_bank,$ps_chque_bra
 }
 	
 function getBank2(){
-global $bank_id,$bank_code,$bank_name;
+global $bank_id,$bank_code,$bank_name, $conn;
 	include('config.php');
 		$query="SELECT id,bank_code,name FROM bank WHERE `status`='1'";
 		$result=mysqli_query($conn,$query);
