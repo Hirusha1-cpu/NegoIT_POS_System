@@ -197,7 +197,7 @@ function getOneOrder()
 	$pay_id, $cash_amount, $chque_amount, $bi_cust, $odr_date, $bi_salesman, $bi_seen_by, $bi_seen_date, $bi_cross_checked_by,
 	$bi_seen_time, $bi_packed_by, $bi_packed_date, $bi_packed_time, $bi_shipped_by, $bi_shipped_date, $bi_shipped_time,
 	$bi_deliverd_by, $bi_deliverd_date, $bi_deliverd_time, $cu_id, $bm_type, $bm_status, $tm_template, $bm_district, $cu_id, $odr_bi_order, $user_name,
-	$bi_cross_checked_date, $bi_cross_checked_time;
+	$bi_cross_checked_date, $bi_cross_checked_time, $conn2;
 	$invoice_no = $_REQUEST['id'];
 	$user_name = $_COOKIE['user'];
 	$cash_amount = $chque_amount = 0;
@@ -622,7 +622,7 @@ function generateReturnListOdr()
 // update by nirmal 06_02_2024 changed itq.location=rm.store query to rm.mapped_inventory
 function getUnpackedReturn($cu)
 {
-	global $rtn_inv, $rtn_id, $rtn_date, $rtn_by, $rtn_itm_code, $rtn_itm_desc, $rtn_qty, $dis_date, $rtn_st, $rtn_drawer;
+	global $rtn_inv, $rtn_id, $rtn_date, $rtn_by, $rtn_itm_code, $rtn_itm_desc, $rtn_qty, $dis_date, $rtn_st, $rtn_drawer, $conn2;
 	$rtn_id = array();
 	include('config.php');
 
@@ -652,7 +652,7 @@ function getUnpackedReturn($cu)
 
 function getCancelRerunCRBalance()
 {
-	global $return_cr_bal;
+	global $return_cr_bal, $conn2;
 	$odr_no = $_GET['id'];
 	include('config.php');
 
@@ -729,7 +729,7 @@ function removeOneRetunItem()
 
 function getPackedReturn()
 {
-	global $rtn2_inv, $rtn2_id, $rtn2_date, $rtn2_by, $rtn2_itm_code, $rtn2_itm_desc, $rtn2_qty, $dis2_date, $rtn2_st;
+	global $rtn2_inv, $rtn2_id, $rtn2_date, $rtn2_by, $rtn2_itm_code, $rtn2_itm_desc, $rtn2_qty, $dis2_date, $rtn2_st, $conn2;
 	$odr_id = $_GET['id'];
 	$rtn2_id = array();
 
@@ -1298,6 +1298,7 @@ function removeReturnPacked1()
 
 function calculateDiscountOdr($cust, $itemid, $price, $discount_value, $discount_type)
 {
+	global $conn;
 	include('config.php');
 	$query = "SELECT `status` FROM cust WHERE id='$cust'";
 	$row = mysqli_fetch_row(mysqli_query($conn, $query));
@@ -1361,7 +1362,7 @@ function calculateDiscountOdr($cust, $itemid, $price, $discount_value, $discount
 // add item to invoice
 function apendBillOdr($case, $systemid, $storecrossitm, $storecrossst)
 {
-	global $message, $invoice_no, $salesman, $cust;
+	global $message, $invoice_no, $salesman, $cust, $conn2, $conn;
 	$invoice_no = $_REQUEST['id'];
 	$itemid = $_REQUEST['itemid'];
 	$qty = $qty0 = $_REQUEST['qty'];
@@ -1948,7 +1949,7 @@ function removeBillitemOdr()
 
 function updateBillitemOdr()
 {
-	global $message, $salesman, $cust, $invoice_no;
+	global $message, $salesman, $cust, $invoice_no, $conn;
 	$itemid = $_REQUEST['id'];
 	$qty = $_REQUEST['qty'];
 	$salesman = $_REQUEST['s'];
@@ -2169,6 +2170,7 @@ function updateBillitemOdr()
 
 function calculateTotalOdr()
 {
+	global $conn;
 	$item_id = $_GET['id'];
 	include('config.php');
 	$systemid = inf_systemid(1);
@@ -2221,7 +2223,7 @@ function calculateTotalOdr()
 
 function getItemsOdr($item_filter, $sub_system, $systemid)
 {
-	global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item;
+	global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item, $conn;
 	$unic_item_code = $qry_filter = '';
 	$unic_item_list = $unic = $tt_item = $tt_qty = $drawer = $qty = $r_price = $w_price = $description = $code = $id = $unic_item_list2 = $pr_sr = array();
 	$store = $_COOKIE['store'];
@@ -2395,6 +2397,7 @@ function getItemsOdr($item_filter, $sub_system, $systemid)
 
 function processInventoryNewOdr($item, $lastitem, $store, $table)
 {
+	global $conn;
 	$nt_id = $itq_qty = '';
 
 	include('config.php');
@@ -2480,7 +2483,7 @@ function crossTransferOdr($invoice_no, $itemid, $fromstore, $qty)
 
 function getCustOdrItem()
 {
-	global $bi_desc, $bi_qty, $bi_price, $bi_discount, $item_filter, $bm_cust, $bm_salesman;
+	global $bi_desc, $bi_qty, $bi_price, $bi_discount, $item_filter, $bm_cust, $bm_salesman, $conn2;
 	$bm_id = $_GET['id'];
 	include('config.php');
 
@@ -2500,7 +2503,7 @@ function getCustOdrItem()
 
 function setStatus($method)
 {
-	global $message, $type, $invoice_no;
+	global $message, $type, $invoice_no, $conn;
 
 	$invoice_no = $_REQUEST['id'];
 	$salesman = $_COOKIE['user_id'];
@@ -2743,8 +2746,12 @@ function setStatus($method)
 				if ($systemid == 17 && $sub_system == 1) {
 					$tax_added_value = 0;
 				}
+				$payment1 = (float)$payment1;
+				$payment2 = (float)$payment2;
+				$tax_added_value = (float)$tax_added_value;
 
-				$query2 = "UPDATE bill_main SET `invoice_+total`='$payment1', `invoice_-total`='$payment2', `tax` = '$tax_added_value'  WHERE invoice_no='$invoice_no'";
+				$query2 = "UPDATE bill_main SET `invoice_+total`='$payment1', `invoice_-total`='$payment2', `tax` = '$tax_added_value' WHERE invoice_no='$invoice_no'";
+				// $query2 = "UPDATE bill_main SET `invoice_+total`='$payment1', `invoice_-total`='$payment2', `tax` = '$tax_added_value'  WHERE invoice_no='$invoice_no'";
 				$result2 = mysqli_query($conn, $query2);
 				$delivered_updated = true;
 
@@ -3340,6 +3347,7 @@ function setStatus($method)
 
 function getAllCustomerItems()
 {
+	global $conn;
 	include('config.php');
 	$invoice_no = $_REQUEST['id'];
 	$searchableList = [];
@@ -3447,7 +3455,7 @@ function ajaxSetStatus()
 // update by nirmal 18_12_2024 (error log bug fix)
 function orderUnassign()
 {
-	global $message;
+	global $message, $conn;
 	$authorization = false;
 	$message = 'Error: The order could not be unassigned';
 	// old code
@@ -3580,6 +3588,7 @@ function searchOrderItems()
 // update by nirmal 07_10_2024 (added system id 17 sms sending code)
 function sms3($invoice_no)
 {
+	global $conn2;
 	$sub_system = $_COOKIE['sub_system'];
 	$timenow = timeNow();
 	$msg = $cr_balance_txt = '';
@@ -3758,7 +3767,7 @@ function getUnicReturn()
 // updated by nirmal 06_05_2025 (added qb integration)
 function processReturn()
 {
-	global $message;
+	global $message, $conn;
 	$item = $_REQUEST['item'];
 	$invrtn = $_REQUEST['invrtn'];
 	$disrtn = $_REQUEST['disrtn'];
@@ -4060,7 +4069,7 @@ function moveUnicDis()
 
 function generateAddressTag()
 {
-	global $from_name, $from_address, $from_mob, $to_name, $to_address, $to_mob;
+	global $from_name, $from_address, $from_mob, $to_name, $to_address, $to_mob, $conn2;
 	$id = $_GET['id'];
 	$store = $_COOKIE['store'];
 	include('config.php');
@@ -4295,7 +4304,7 @@ function getTrackingReport()
 
 function getCommisionReport()
 {
-	global $from_date, $to_date, $store, $r1_odr_no, $r1_odr_date, $r1_pick_date, $r1_pack_date, $r1_amount, $r2_odr_no, $r2_pick_by, $r2_pack_by, $r2_amount, $r2_pick_date, $r2_pack_date, $user_arr, $r2_pick_uniq, $r2_pack_uniq;
+	global $from_date, $to_date, $store, $r1_odr_no, $r1_odr_date, $r1_pick_date, $r1_pack_date, $r1_amount, $r2_odr_no, $r2_pick_by, $r2_pack_by, $r2_amount, $r2_pick_date, $r2_pack_date, $user_arr, $r2_pick_uniq, $r2_pack_uniq, $conn2;
 	$date_list = $user_arr = $r2_pick_by = $r2_pack_by = $r2_pick_uniq = $r2_pack_uniq = $r1_amount = $r2_odr_no = array();
 	if (isset($_GET['from_date']) && isset($_GET['to_date']) && isset($_GET['store'])) {
 		$from_date = $_GET['from_date'];

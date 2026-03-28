@@ -1316,6 +1316,7 @@ function getItems($sub_system)
 // update by nirmal 11_07_2024 (fixed store filter same as view)
 function getUnicItems($sub_system)
 {
+	global $conn2;
 	$item_category = $item_desc = $item_sn = $item_shipment_date = $item_trans_date = $item_inv = array();
 	$item_category_1 = $item_desc_1 = $item_cost_1 = $item_qty_1 = $items_values_1 = array();
 	$user = $_COOKIE['user'];
@@ -3208,7 +3209,7 @@ function getOneItem($sub_system)
 {
 	global $unic_cal, $id, $code, $description, $po_description, $w_price, $r_price, $c_price, $min_w_rate, $max_w_rate, $max_r_rate, $itm_def_cost,
 	$itm_def_price, $itm_pr_sr, $drawer, $qty, $commision, $category, $supplier, $stores_id, $itm_status, $itm_unic, $stores_name, $inv_type, $tb_id, $color1, $unit_type,
-	$inv_ship_id, $itq_id, $item_id, $store_id, $rowClass;
+	$inv_ship_id, $itq_id, $item_id, $store_id, $rowClass, $conn2;
 	$code0 = $_REQUEST['code0'];
 	$unic_cal = unicCal();
 	$inv_ship_id = $itq_id = $item_id = $store_id = $rowClass = $w_price = $r_price = $c_price = $drawer = $qty = $qty_new = array();
@@ -3242,11 +3243,21 @@ function getOneItem($sub_system)
 	$unit_type = $row[15];
 
 	if (($unic_cal) && ($itm_unic == 1)) {
-		$query = "SELECT iui.`inv_ship_id`,iui.`itq_id`, iui.w_price,iui.r_price,iui.c_price,COUNT(*),s.name,iq.`drawer_no`, iq.`item`,s.`id`
-				FROM inventory_unic_item iui, `inventory_qty` iq, `inventory_items` ii, stores s
-				WHERE iq.`id`=iui.`itq_id` AND ii.`id` = iq.item AND s.id = iq.location AND ii.id = '$id' AND iui.`status`='0' $sub_sys_qry1
-				GROUP BY iui.w_price, iui.r_price, iui.c_price, s.id
-				ORDER BY s.id";
+		// $query = "SELECT iui.`inv_ship_id`,iui.`itq_id`, iui.w_price,iui.r_price,iui.c_price,COUNT(*),s.name,iq.`drawer_no`, iq.`item`,s.`id`
+		// 		FROM inventory_unic_item iui, `inventory_qty` iq, `inventory_items` ii, stores s
+		// 		WHERE iq.`id`=iui.`itq_id` AND ii.`id` = iq.item AND s.id = iq.location AND ii.id = '$id' AND iui.`status`='0' $sub_sys_qry1
+		// 		GROUP BY iui.w_price, iui.r_price, iui.c_price, s.id
+		// 		ORDER BY s.id";
+		$query = "SELECT iui.`inv_ship_id`, iui.`itq_id`, iui.w_price, iui.r_price, iui.c_price, 
+          COUNT(*) as item_count, s.name, iq.`drawer_no`, iq.`item`, s.`id`
+          FROM inventory_unic_item iui
+          INNER JOIN `inventory_qty` iq ON iq.`id` = iui.`itq_id`
+          INNER JOIN `inventory_items` ii ON ii.`id` = iq.item
+          INNER JOIN stores s ON s.id = iq.location
+          WHERE ii.id = '$id' AND iui.`status` = '0' $sub_sys_qry1
+          GROUP BY iui.inv_ship_id, iui.itq_id, iui.w_price, iui.r_price, iui.c_price, 
+                   s.name, iq.drawer_no, iq.item, s.id
+          ORDER BY s.id";
 		$result = mysqli_query($conn2, $query);
 		$currentStore = null;
 		$isFirstRow = true;
@@ -3341,7 +3352,7 @@ function getOneItem($sub_system)
 // edit by nirmal 28_11_2023 (added capability to update item description po-description with => / and &)
 function editItem1($sub_system)
 {
-	global $message, $code;
+	global $message, $code, $conn;
 
 	$qry_qty1 = $qry_qty2 = $qry_qty3 = '';
 	$message = '';
@@ -3764,7 +3775,7 @@ function editItem2($sub_system)
 // added by nirmal 12_07_2024
 function editUnicsPrice($sub_system)
 {
-	global $message;
+	global $message, $conn;
 	$message = 'Done';
 	$status = 'success';
 	$master_pw = $_GET['master_pw'];
@@ -4397,7 +4408,7 @@ function getDistrict()
 // update by nirmal 08_12_2023
 function addSpecialPrice($sub_system)
 {
-	global $message;
+	global $message, $conn;
 	$itemdes = $_REQUEST['item'];
 	$district = $_REQUEST['district'];
 	$increment = $_REQUEST['increment'];
@@ -4861,7 +4872,7 @@ function enableRepairPart()
 
 function drawerSearch()
 {
-	global $drawer, $store, $report_date, $dr_no, $dr_item, $dr_qty, $dr_category;
+	global $drawer, $store, $report_date, $dr_no, $dr_item, $dr_qty, $dr_category, $conn2;
 	$store = $_GET['st'];
 	$report_date = dateNow();
 	$dr_no = array();
@@ -5137,6 +5148,7 @@ function updateTag($tag_id, $tag_name, $tag_profit)
 
 function showItemTags($item_id)
 {
+	global $conn2;
 	$jasonArray = array();
 	include('config.php');
 	$query = "SELECT tn.id,tn.tag FROM tag_name tn, tag_assignment ta WHERE tn.id=ta.tag AND ta.item='$item_id'";

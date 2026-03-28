@@ -667,7 +667,7 @@ global $itm_id,$itm_desc,$conn2;
 
 // update by nirmal 16_10_2023
 function getCatalog(){
-	global $decimal,$from_date,$to_date,$qty_order,$show_all,$direct_mkt,$sold_color,$today,$selected_cat,$filter_category_id,$filter_category_name,$district,$cust_id,$item_id,$item_desc,$cat_itemid,$cat_category,$cat_desc,$cat_min_w_rate,$cat_max_w_rate,$cat_max_r_rate,$w_price,$r_price,$cat_qty,$cat_last_rate,$cat_store,$conn;
+	global $decimal,$from_date,$to_date,$qty_order,$show_all,$direct_mkt,$sold_color,$today,$selected_cat,$filter_category_id,$filter_category_name,$district,$cust_id,$item_id,$item_desc,$cat_itemid,$cat_category,$cat_desc,$cat_min_w_rate,$cat_max_w_rate,$cat_max_r_rate,$w_price,$r_price,$cat_qty,$cat_last_rate,$cat_store,$conn, $conn2;
 	$sp_item=$sp_increment=$sp_category=$sp_catincrement=$cat_filter=$sold_items=$sold_discounted=$filter_category_id=$filter_category_name=$cat_desc=array();
 	$direct_mkt=$_COOKIE['direct_mkt'];
 	$user_id=$_COOKIE['user_id'];
@@ -816,16 +816,27 @@ function getCatalog(){
 }
 
 function getDiscount(){
+	global $conn2;
 	$itemid=$_GET['itemid'];
 	$cust_id=$_GET['cust_id'];
 
 	include('config.php');
 	$query="SELECT bi.unit_price,bi.discount FROM bill bi, bill_main bm WHERE bm.invoice_no=bi.invoice_no AND bm.`cust`='$cust_id' AND bi.item='$itemid' AND bi.discount>0 ORDER BY bi.id DESC LIMIT 1";
 	$row1=mysqli_fetch_row(mysqli_query($conn2,$query));
-	$last_sold_price=$row1[0]+$row1[1];
-	if(($row1[0]!='')&&($row1[1]!='')){
-		$last_discount=round(($row1[1]/($row1[0]+$row1[1]))*100);
-	}else $last_discount=0;
+	// $last_sold_price=$row1[0]+$row1[1];
+	// if(($row1[0]!='')&&($row1[1]!='')){
+	// 	$last_discount=round(($row1[1]/($row1[0]+$row1[1]))*100);
+	// }else $last_discount=0;
+	$row1_0 = $row1[0] ?? 0;
+	$row1_1 = $row1[1] ?? 0;
+	$last_sold_price = $row1_0 + $row1_1;
+
+	if ($row1_0 != '' && $row1_1 != '' && ($row1_0 + $row1_1) > 0) {
+    	$last_discount = round(($row1_1 / ($row1_0 + $row1_1)) * 100);
+	} else {
+    	$last_discount = 0;
+	}
+
 
 	return $last_discount.'|'.$last_sold_price;
 }

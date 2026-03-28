@@ -2360,7 +2360,9 @@ function getQuotationItems()
 		$quot_no = $_REQUEST['id'];
 		include('config.php');
 		$query = "SELECT qi.id,itm.description,qi.qty,qi.unit_price,itm.pr_sr,qi.comment FROM quotation qi, inventory_items itm WHERE qi.item=itm.id AND qi.quot_no='$quot_no'";
+		error_log("getQuotationItems query: " . $query);
 		$result = mysqli_query($conn2, $query);
+		error_log("getQuotationItems result: " . print_r($result, true));
 		while ($row = mysqli_fetch_array($result)) {
 			$qi_id[] = $row[0];
 			$qo_itm_des[] = $row[1];
@@ -2386,7 +2388,61 @@ function getQuotationItems()
 			$item_filter = 3;
 	}
 }
+function getQuotationItems1()
+{
+    global $qi_id, $qo_itm_des, $qo_itm_qty, $qo_itm_uprice, $total, $item_filter, $qo_discount, $qo_comment, $conn2;
+    $pr_sr = '';
+    $total = 0;
+    $qo_itm_des = $qo_comment = array();
 
+    error_log("=== START getQuotationItems ===");
+    
+    if (isset($_REQUEST['id'])) {
+        $quot_no = $_REQUEST['id'];
+        include('config.php');
+        $query = "SELECT qi.id,itm.description,qi.qty,qi.unit_price,itm.pr_sr,qi.comment FROM quotation qi, inventory_items itm WHERE qi.item=itm.id AND qi.quot_no='$quot_no'";
+        error_log("getQuotationItems query: " . $query);
+        $result = mysqli_query($conn2, $query);
+        
+        if (!$result) {
+            error_log("QUOTATION QUERY ERROR: " . mysqli_error($conn2));
+        } else {
+            $row_count = mysqli_num_rows($result);
+            error_log("Quotation query returned $row_count rows");
+            
+            while ($row = mysqli_fetch_array($result)) {
+                $qi_id[] = $row[0];
+                $qo_itm_des[] = $row[1];
+                $qo_itm_qty[] = $row[2];
+                $qo_itm_uprice[] = $row[3];
+                $pr_sr = $row[4];
+                $total += $row[2] * $row[3];
+                $qo_comment[] = $row[5];
+                error_log("Quotation item - ID: {$row[0]}, Description: {$row[1]}, Qty: {$row[2]}, Price: {$row[3]}, Total: " . ($row[2] * $row[3]));
+            }
+        }
+
+        $query1 = "SELECT qm.`discount` FROM quotation_main qm WHERE qm.`id`='$quot_no'";
+        error_log("Discount query: $query1");
+        $result1 = mysqli_query($conn2, $query1);
+        $row1 = mysqli_fetch_assoc($result1);
+        $qo_discount = $row1['discount'];
+        error_log("Quotation discount: " . $qo_discount);
+
+        if ($pr_sr == '')
+            $item_filter = 'all';
+        if ($pr_sr == 1)
+            $item_filter = 1;
+        if ($pr_sr == 2)
+            $item_filter = 2;
+        if ($pr_sr == 3)
+            $item_filter = 3;
+        
+        error_log("Item filter set to: $item_filter, Total: $total");
+    }
+    
+    error_log("=== END getQuotationItems ===");
+}
 // added by nirmal 29_07_2024
 // update by nirmal 18_09_2024 (fix special character insert bug)
 function updateQuotComment()
@@ -2526,6 +2582,7 @@ function newQuot($cust0)
 // added by nirmal 20_02_2024
 function addTaxForQuotationMain($quot_no)
 {
+	global $conn;
 	include('config.php');
 	$out = true;
 	$message = '';
@@ -2563,7 +2620,7 @@ function addTaxForQuotationMain($quot_no)
 // update by nirmal 17_05_2024 (add user restrictions to add items to quotation)
 function apendQuot()
 {
-	global $message, $quot_no, $salesman, $cust;
+	global $message, $quot_no, $salesman, $cust, $conn;
 	$discount0 = '';
 	$bill_new_status = '';
 	$out = $qty_proceed = true;
@@ -3139,7 +3196,7 @@ function removeQuotDiscount()
 
 function getDetaultTerms()
 {
-	global $qo_warranty, $qo_validity, $qo_leadtime, $address1, $address2, $sys_comp_name, $st_comp_name;
+	global $qo_warranty, $qo_validity, $qo_leadtime, $address1, $address2, $sys_comp_name, $st_comp_name, $conn2;
 	$qo_number = $_GET['id'];
 	$store = $_COOKIE['store'];
 	include('config.php');
@@ -3165,7 +3222,7 @@ function getDetaultTerms()
 }
 function getQOTerms()
 {
-	global $tm_att, $tm_heading, $tm_warranty, $tm_validity, $tm_leadtime, $tm_terms1, $tm_terms2, $tm_note, $tm_address;
+	global $tm_att, $tm_heading, $tm_warranty, $tm_validity, $tm_leadtime, $tm_terms1, $tm_terms2, $tm_note, $tm_address, $conn2;
 	$quot_no = $_GET['id'];
 	include('config.php');
 	$query = "SELECT att,heading,warranty,validity,leadtime,terms1,terms2,note,address FROM quotation_main WHERE id='$quot_no'";
@@ -3184,7 +3241,7 @@ function getQOTerms()
 // added by nirmal 17_02_2025
 function getQOCustomerAddress()
 {
-	global $cust_address;
+	global $cust_address, $conn;
 	include('config.php');
 	$qo_number = $_GET['id'];
 
@@ -3245,7 +3302,7 @@ function setQuotCustomerAddress()
 // update by nirmal 17_05_2024 (added quotation edit user as quotation created user)
 function setQuotTerms()
 {
-	global $message, $quot_no;
+	global $message, $quot_no, $conn;
 	$quot_no = $_GET['id'];
 	$qo_heading = $_POST['heading'];
 	$qo_attention = $_POST['att'];
@@ -3287,7 +3344,7 @@ function setQuotTerms()
 // update by nirmal 14_07_2025 (added payment quotation no as null when qo delete)
 function setQuotStatus($new_status)
 {
-	global $message, $quot_no, $salesman, $cust;
+	global $message, $quot_no, $salesman, $cust, $conn;
 	$quot_no = $_GET['id'];
 	$salesman = $_COOKIE['user_id'];
 	$datetime = timeNow();
@@ -3363,7 +3420,8 @@ function setQuotStatus($new_status)
 		}
 	}
 	if ($out) {
-		$query = "UPDATE `payment` SET `quotation_no`=NULL WHERE `quotation_no`='$quot_no'";
+		// $query = "UPDATE `payment` SET `quotation_no`=NULL WHERE `quotation_no`='$quot_no'";
+		$query = "UPDATE `payment` SET `invoice_no` = NULL WHERE `invoice_no` = '$quot_no'";
 		$result = mysqli_query($conn, $query);
 		if (!$result) {
 			$out = false;
@@ -4561,7 +4619,7 @@ function qoNote()
 // added by nirmal 2024_06_26
 function qoUpdateSentWithTax()
 {
-	global $quot_no, $message;
+	global $quot_no, $message, $conn;
 	$quot_no = $_GET['id'];
 	$flag = $_GET['flag'];
 	include('config.php');

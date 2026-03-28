@@ -237,7 +237,12 @@
 		</tr>
 			<?php
 				for($i=0;$i<sizeof($qm_id);$i++){
-					$qm_heading0=str_replace("Quotation for ","",$qm_heading[$i]);
+					if(isset($qm_heading[$i]) && !is_null($qm_heading[$i])) {
+						$qm_heading0 = str_replace("Quotation for ", "", $qm_heading[$i]);
+					} else {
+						$qm_heading0 = ''; // or handle the empty case appropriately
+					}
+					// $qm_heading0=str_replace("Quotation for ","",$qm_heading[$i]);
 					if(strlen($qm_heading0)>25) $qm_heading0=substr($qm_heading0,0,25).'...'; else $qm_heading0=$qm_heading0;
 					if($qm_qty_avalability[$i]) $row_color='wheat'; else $row_color='#F5F5F5';
 					if($qm_status[$i]=='7') $qm_st='<a style="cursor:pointer; text-decoration:none" title="'.$qm_rejected_com[$i].'">'.$qm_status_name[$i].'</a>'; else $qm_st=$qm_status_name[$i];

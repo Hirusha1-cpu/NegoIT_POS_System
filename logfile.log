@@ -652,3 +652,54 @@ updateCust: FILES data: Array
         )
 
 )
+upload_max_filesize = 2M
+post_max_size = 8M
+max_file_uploads = 20
+addCustImage called with cust_id: 14POST data: Array
+(
+    [cust_id] => 14
+)
+FILES data: Array
+(
+    [fileToUpload1] => Array
+        (
+            [name] => pexels-pixabay-122429-_1_.jpeg
+            [full_path] => pexels-pixabay-122429-_1_.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /private/var/folders/wq/89tq2s_x7lb1st7yvy5wgv480000gn/T/phplNc6N7
+            [error] => 0
+            [size] => 251091
+        )
+
+    [fileToUpload2] => Array
+        (
+            [name] => pexels-pixabay-122429-_1_.jpeg
+            [full_path] => pexels-pixabay-122429-_1_.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /private/var/folders/wq/89tq2s_x7lb1st7yvy5wgv480000gn/T/phpYQgp79
+            [error] => 0
+            [size] => 251091
+        )
+
+    [fileToUpload3] => Array
+        (
+            [name] => pexels-pixabay-122429-_1_.jpeg
+            [full_path] => pexels-pixabay-122429-_1_.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /private/var/folders/wq/89tq2s_x7lb1st7yvy5wgv480000gn/T/phpUOuyA4
+            [error] => 0
+            [size] => 251091
+        )
+
+    [fileToUpload4] => Array
+        (
+            [name] => pexels-pixabay-122429-_1_.jpeg
+            [full_path] => pexels-pixabay-122429-_1_.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /private/var/folders/wq/89tq2s_x7lb1st7yvy5wgv480000gn/T/phpl9jYGL
+            [error] => 0
+            [size] => 251091
+        )
+
+)
+cust_id: 14, image1: 1, image2: 1, image3: 1, image4: 1, query: UPDATE `cust` SET `status`= `status` ,`image1`='1' ,`image2`='1' ,`image3`='1' ,`image4`='1' WHERE `id`='14' 

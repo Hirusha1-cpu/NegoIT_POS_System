@@ -1202,6 +1202,7 @@ function dailyInventory()
 
 function mismatch($itq_id)
 {
+	global $conn2;
 	include('config.php');
 	$query1 = "SELECT itq.qty,itm.unic,itm.id,itq.location FROM inventory_items itm, inventory_qty itq WHERE itm.id=itq.item AND itq.id='$itq_id'";
 	$row1 = mysqli_fetch_row(mysqli_query($conn2, $query1));
@@ -1654,6 +1655,7 @@ function isDeletedMenuActive()
 // added by nirmal 12_10_2023
 function getStoreLogo($method)
 {
+	global $conn2;
 	if (isset($_SESSION['store_logo'])) {
 		return $_SESSION['store_logo'];
 	} else {
@@ -1693,6 +1695,7 @@ function getUnitTypes($method)
 // added by nirmal 15_12_2023
 function getStoreName($method)
 {
+	global $conn2;
 	if ($method == 1)
 		include('config.php');
 	if ($method == 2)
@@ -1763,30 +1766,76 @@ function getSMSShopName($method)
 }
 
 // added by nirmal 27_12_2023
+// function isCustomInvoiceNoActive($method)
+// {
+// 	global $conn2;
+// 	if (isset($_SESSION['is_custom_invoice_no_active'])) {
+// 		return $_SESSION['is_custom_invoice_no_active'];
+// 		} else {
+// 			if ($method == 1)
+// 				include('config.local.php');
+// 			if ($method == 2)
+// 				include('../../../../config.php');
+				
+// 		$result = mysqli_query($conn2, "SELECT `value` FROM settings WHERE `setting`='custom_invoice_no_active'");
+// 		$row = mysqli_fetch_assoc($result);
+// 		if (!empty($row)) {
+// 			if ($row['value'] == 1) {
+// 				$_SESSION["is_custom_invoice_no_active"] = 1;
+// 			} else {
+// 				$_SESSION["is_custom_invoice_no_active"] = 0;
+// 			}
+// 		} else {
+// 			$_SESSION["is_custom_invoice_no_active"] = 0;
+// 		}
+// 		return $_SESSION['is_custom_invoice_no_active'];
+// 	}
+// }
+
 function isCustomInvoiceNoActive($method)
 {
-	if (isset($_SESSION['is_custom_invoice_no_active'])) {
-		return $_SESSION['is_custom_invoice_no_active'];
-		} else {
-			if ($method == 1)
-				include('config.php');
-			if ($method == 2)
-				include('../../../../config.php');
-			
-			global $conn2;
-		$result = mysqli_query($conn2, "SELECT `value` FROM settings WHERE `setting`='custom_invoice_no_active'");
-		$row = mysqli_fetch_assoc($result);
-		if (!empty($row)) {
-			if ($row['value'] == 1) {
-				$_SESSION["is_custom_invoice_no_active"] = 1;
-			} else {
-				$_SESSION["is_custom_invoice_no_active"] = 0;
-			}
-		} else {
-			$_SESSION["is_custom_invoice_no_active"] = 0;
-		}
-		return $_SESSION['is_custom_invoice_no_active'];
-	}
+    global $conn2;
+    
+    if (isset($_SESSION['is_custom_invoice_no_active'])) {
+        return $_SESSION['is_custom_invoice_no_active'];
+    } else {
+        // Include config to initialize $conn2 if not already set
+        if ($method == 1) {
+            include('config.php');
+        }
+        if ($method == 2) {
+            include('../../../../config.php');
+        }
+        
+        // Check if connection was established
+        if (!$conn2) {
+            // Try to use $conn as fallback
+            global $conn;
+            if ($conn) {
+                error_log("Using \$conn as fallback in isCustomInvoiceNoActive");
+                $conn2 = $conn;
+            } else {
+                error_log("Database connection \$conn2 is null in isCustomInvoiceNoActive()");
+                $_SESSION["is_custom_invoice_no_active"] = 0;
+                return 0;
+            }
+        }
+        
+        $result = mysqli_query($conn2, "SELECT `value` FROM settings WHERE `setting`='custom_invoice_no_active'");
+        
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $_SESSION["is_custom_invoice_no_active"] = ($row['value'] == 1) ? 1 : 0;
+            mysqli_free_result($result);
+        } else {
+            $_SESSION["is_custom_invoice_no_active"] = 0;
+            if (!$result) {
+                error_log("Query failed: " . mysqli_error($conn2));
+            }
+        }
+        
+        return $_SESSION['is_custom_invoice_no_active'];
+    }
 }
 
 // added by nirmal 23_12_2023

@@ -123,8 +123,8 @@
 			var salesman=document.getElementById('salesman').value;
 			var cust=document.getElementById('cust').value;
 			var check= confirm('Are you sure you want to change this item unit price to '+price+'?');
-			if(check== true){
-				window.location = 'index.php?components=<?php print $components; ?>&action=qo_item_update_unit_price&id='+$id+'&price='+price+'&s='+salesman+'&cust='+cust;
+			if(check== true){qo_item_update_unit_price
+				window.location = 'index.php?components=<?php print $components; ?>&action=&id='+$id+'&price='+price+'&s='+salesman+'&cust='+cust;
 			}
 
 		}

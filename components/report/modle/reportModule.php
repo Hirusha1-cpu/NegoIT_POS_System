@@ -335,7 +335,7 @@ function salesman(){
 }
 
 function salesmanInvoices(){
-	global $invoice_no,$time,$invoice_total,$invoice_profit,$salesman_name;
+	global $invoice_no,$time,$invoice_total,$invoice_profit,$salesman_name, $conn2;
 	$month=$_REQUEST['month'];
 	$id=$_REQUEST['id'];
 

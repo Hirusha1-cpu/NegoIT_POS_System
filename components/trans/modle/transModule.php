@@ -36,7 +36,7 @@ function trnsStatus($status_id)
 // update by nirmal 21_11_2023
 function getItems()
 {
-	global $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $unic_item_code, $unic_item_list, $unic_qty, $conn;
+	global $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $unic_item_code, $unic_item_list, $unic_qty, $conn, $conn2;
 	$store = $_COOKIE['store'];
 	$unic_cal = unicCal();
 	$unic_item_code = '';
@@ -156,6 +156,7 @@ function getStores($systemid, $sub_system)
 
 function processInventoryNew($item, $lastitem)
 {
+	global $conn;
 	$store = $_COOKIE['store'];
 	$nt_id = '';
 
@@ -235,7 +236,7 @@ function newGTN()
 // updated by nirmal 21_04_2025 (added new transfer price column for system id 26)
 function apendGTN()
 {
-	global $message, $tostore, $gtn_no;
+	global $message, $tostore, $gtn_no, $conn;
 	$gtn_no = $_POST['id'];
 	$itemid = $_REQUEST['itemid'];
 	$qty = $_REQUEST['qty'];
@@ -538,7 +539,7 @@ function removeGTNitem()
 function getGTNItems()
 {
 	global $gtn_itemid, $gtn_desc, $gtn_desc2, $gtn_qty, $gtn_drawer, $gtn_no_update, $dups, $dups_count,
-	$gtn_comment;
+	$gtn_comment, $conn;
 	$gtn_itemid = array();
 	if (isset($_REQUEST['id'])) {
 		$gtn_no = $_REQUEST['id'];
@@ -620,7 +621,7 @@ function updateGtnComment()
 function generateGTN()
 {
 	global $gtn_no, $gtn_item_id, $gtn_item_des, $gtn_item_qty, $gtn_item_draw, $gtn_item_from, $gtn_item_to, $gtn_date, $gtn_from_user,
-	$gtn_to_user, $gtn_c_price, $gtn_cross_invoice, $total_cost, $gtn_status, $gtn_from_shop_name, $gtn_item_unit, $gtn_comment;
+	$gtn_to_user, $gtn_c_price, $gtn_cross_invoice, $total_cost, $gtn_status, $gtn_from_shop_name, $gtn_item_unit, $gtn_comment, $conn, $conn2;
 	$gtn_no = $_REQUEST['id'];
 	$user_id = $_COOKIE['user_id'];
 	$gtn_from = $gtn_to = '';
@@ -901,7 +902,7 @@ function setStatusGTN()
 
 function finalizeGTN()
 {
-	global $message, $gtn_no, $tostore;
+	global $message, $gtn_no, $tostore, $conn;
 	$gtn_no = $_REQUEST['id'];
 	$user = $_COOKIE['user_id'];
 	$result2 = false;
@@ -927,7 +928,7 @@ function finalizeGTN()
 
 function gtnOwner()
 {
-	global $gtnowner_id, $gtnowner_name, $gtnremote_name, $gtnowner_status, $gtnowner_crossinv, $trans_delete;
+	global $gtnowner_id, $gtnowner_name, $gtnremote_name, $gtnowner_status, $gtnowner_crossinv, $trans_delete, $conn;
 	$gtn_no = $_REQUEST['id'];
 	$user_id = $_COOKIE['user_id'];
 	$user_arr = array();

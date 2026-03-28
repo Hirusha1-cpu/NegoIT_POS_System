@@ -988,66 +988,193 @@ function validateTMPBill($case)
 }
 
 // update by nirmal 29_03_2022 indent lines
+// function calculateDiscount($cust, $itemid, $price, $discount_value, $discount_type)
+// {
+// 	global $conn;
+// 	include('config.php');
+// 	$query = "SELECT `status` FROM cust WHERE id='$cust'";
+// 	$row = mysqli_fetch_row(mysqli_query($conn, $query));
+// 	$cust_type = $row[0];
+
+// 	$query = "SELECT min_w_rate,max_w_rate,max_r_rate,pr_sr FROM inventory_items WHERE id='$itemid'";
+// 	$row = mysqli_fetch_row(mysqli_query($conn, $query));
+// 	$min_w_rate = $row[0];
+// 	$max_w_rate = $row[1];
+// 	$max_r_rate = $row[2];
+// 	$pr_sr = $row[3];
+
+// 	if ($pr_sr == 1) {
+// 		if ($cust_type == 1) {
+// 			if ($discount_type == 'percentage') {
+// 				if ($max_w_rate >= $discount_value) {
+// 					if ($min_w_rate <= $discount_value) {
+// 						$discount = round(($price / 100) * $discount_value);
+// 					} else {
+// 						$discount = round(($price / 100) * $min_w_rate);
+// 					}
+// 				} else {
+// 					$discount = 'error';
+// 				}
+// 			} else {
+// 				if ((($price * $max_w_rate) / 100) >= $discount_value) {
+// 					if ((($price * $min_w_rate) / 100) <= $discount_value) {
+// 						$discount = $discount_value;
+// 					} else {
+// 						$discount = round((($price * $min_w_rate) / 100));
+// 					}
+// 				} else {
+// 					$discount = 'error';
+// 				}
+// 			}
+// 		} else
+// 			if ($cust_type == 2) {
+// 				if ($discount_type == 'percentage') {
+// 					if ($max_r_rate >= $discount_value)
+// 						$discount = round(($price / 100) * $discount_value);
+// 					else
+// 						$discount = 'error';
+// 				} else {
+// 					if ((($price * $max_r_rate) / 100) >= $discount_value)
+// 						$discount = $discount_value;
+// 					else
+// 						$discount = 'error';
+// 				}
+
+// 			}
+// 	} else {
+// 		if ($discount_type == 'percentage') {
+// 			$discount = round(($price / 100) * $discount_value);
+// 		} else {
+// 			$discount = $discount_value;
+// 		}
+// 	}
+// 	return $discount;
+// }
 function calculateDiscount($cust, $itemid, $price, $discount_value, $discount_type)
 {
-	include('config.php');
-	$query = "SELECT `status` FROM cust WHERE id='$cust'";
-	$row = mysqli_fetch_row(mysqli_query($conn, $query));
-	$cust_type = $row[0];
-
-	$query = "SELECT min_w_rate,max_w_rate,max_r_rate,pr_sr FROM inventory_items WHERE id='$itemid'";
-	$row = mysqli_fetch_row(mysqli_query($conn, $query));
-	$min_w_rate = $row[0];
-	$max_w_rate = $row[1];
-	$max_r_rate = $row[2];
-	$pr_sr = $row[3];
-
-	if ($pr_sr == 1) {
-		if ($cust_type == 1) {
-			if ($discount_type == 'percentage') {
-				if ($max_w_rate >= $discount_value) {
-					if ($min_w_rate <= $discount_value) {
-						$discount = round(($price / 100) * $discount_value);
-					} else {
-						$discount = round(($price / 100) * $min_w_rate);
-					}
-				} else {
-					$discount = 'error';
-				}
-			} else {
-				if ((($price * $max_w_rate) / 100) >= $discount_value) {
-					if ((($price * $min_w_rate) / 100) <= $discount_value) {
-						$discount = $discount_value;
-					} else {
-						$discount = round((($price * $min_w_rate) / 100));
-					}
-				} else {
-					$discount = 'error';
-				}
-			}
-		} else
-			if ($cust_type == 2) {
-				if ($discount_type == 'percentage') {
-					if ($max_r_rate >= $discount_value)
-						$discount = round(($price / 100) * $discount_value);
-					else
-						$discount = 'error';
-				} else {
-					if ((($price * $max_r_rate) / 100) >= $discount_value)
-						$discount = $discount_value;
-					else
-						$discount = 'error';
-				}
-
-			}
-	} else {
-		if ($discount_type == 'percentage') {
-			$discount = round(($price / 100) * $discount_value);
-		} else {
-			$discount = $discount_value;
-		}
-	}
-	return $discount;
+    global $conn;
+    include('config.php');
+    
+    // Default discount value
+    $discount = 0;
+    
+    // Convert and validate inputs
+    $price = (float)$price;
+    $discount_value = is_numeric($discount_value) ? (float)$discount_value : 0;
+    $discount_type = $discount_type ?? 'percentage';
+    
+    // Validate itemid
+    if (empty($itemid) || $itemid == 'undefined' || !is_numeric($itemid)) {
+        error_log("Invalid itemid in calculateDiscount: " . $itemid);
+        // Return default discount based on type
+        if ($discount_type == 'percentage') {
+            return round(($price / 100) * $discount_value);
+        } else {
+            return $discount_value;
+        }
+    }
+    
+    // Get customer type
+    $query = "SELECT `status` FROM cust WHERE id='$cust'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_row($result);
+    
+    if (!$row) {
+        error_log("Customer not found: $cust");
+        if ($discount_type == 'percentage') {
+            return round(($price / 100) * $discount_value);
+        } else {
+            return $discount_value;
+        }
+    }
+    $cust_type = $row[0];
+    
+    // Get item rates
+    $query = "SELECT min_w_rate, max_w_rate, max_r_rate, pr_sr FROM inventory_items WHERE id='$itemid'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_row($result);
+    
+    if (!$row) {
+        error_log("Item not found: $itemid");
+        if ($discount_type == 'percentage') {
+            return round(($price / 100) * $discount_value);
+        } else {
+            return $discount_value;
+        }
+    }
+    
+    $min_w_rate = (float)$row[0];
+    $max_w_rate = (float)$row[1];
+    $max_r_rate = (float)$row[2];
+    $pr_sr = $row[3];
+    
+    // If discount_value is 0 or empty, return 0 immediately
+    if ($discount_value <= 0) {
+        return 0;
+    }
+    
+    if ($pr_sr == 1) {
+        if ($cust_type == 1) {
+            // Wholesale customer
+            if ($discount_type == 'percentage') {
+                if ($max_w_rate >= $discount_value) {
+                    if ($min_w_rate <= $discount_value) {
+                        $discount = round(($price / 100) * $discount_value);
+                    } else {
+                        $discount = round(($price / 100) * $min_w_rate);
+                    }
+                } else {
+                    $discount = 'error';
+                }
+            } else {
+                // Price-based discount
+                $max_discount_amount = round(($price * $max_w_rate) / 100);
+                $min_discount_amount = round(($price * $min_w_rate) / 100);
+                
+                if ($max_discount_amount >= $discount_value) {
+                    if ($min_discount_amount <= $discount_value) {
+                        $discount = $discount_value;
+                    } else {
+                        $discount = $min_discount_amount;
+                    }
+                } else {
+                    $discount = 'error';
+                }
+            }
+        } elseif ($cust_type == 2) {
+            // Retail customer
+            if ($discount_type == 'percentage') {
+                if ($max_r_rate >= $discount_value) {
+                    $discount = round(($price / 100) * $discount_value);
+                } else {
+                    $discount = 'error';
+                }
+            } else {
+                $max_discount_amount = round(($price * $max_r_rate) / 100);
+                if ($max_discount_amount >= $discount_value) {
+                    $discount = $discount_value;
+                } else {
+                    $discount = 'error';
+                }
+            }
+        } else {
+            // Default: no special customer type
+            if ($discount_type == 'percentage') {
+                $discount = round(($price / 100) * $discount_value);
+            } else {
+                $discount = $discount_value;
+            }
+        }
+    } else {
+        // Non-sales item (pr_sr != 1)
+        if ($discount_type == 'percentage') {
+            $discount = round(($price / 100) * $discount_value);
+        } else {
+            $discount = $discount_value;
+        }
+    }
+    
+    return $discount;
 }
 
 // update by nirmal 18_01_2022, discount bug fixed
@@ -1148,6 +1275,7 @@ function addToBill($sub_system)
 		$row1 = mysqli_fetch_row(mysqli_query($conn, $query1));
 		$purchased_qty = ($row1[0] !== null) ? (int) $row1[0] : 0;
 		if ($systemid != 17 && $systemid != 1) {
+			$qty = (int)$qty; 
 			if ((($row1[0] !== null) && ($row1[0] >= -$qty))) {
 				$out = false;
 				error_log("Debug: Validation failed for return quantity. Purchased qty");
@@ -3067,6 +3195,7 @@ function getItems2()
 // update by nirmal 21_10_2023
 function getItems($item_filter, $sub_system, $systemid)
 {
+	error_log("getItems called with item_filter: $item_filter, sub_system: $sub_system, systemid: $systemid");
 	global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item,$conn;
 	$unic_item_code = $qry_filter = '';
 	$unic_item_list = $unic = $tt_item = $tt_qty = $drawer = $qty = $r_price = $w_price = $description = $code = $id = $unic_item_list2 = $pr_sr = array();
@@ -3079,7 +3208,6 @@ function getItems($item_filter, $sub_system, $systemid)
 	$result = mysqli_query($conn, "SELECT value FROM settings WHERE setting='discount'");
 	$row = mysqli_fetch_assoc($result);
 	$discount = $row['value'];
-
 	$result = mysqli_query($conn, "SELECT mapped_inventory FROM userprofile WHERE id='$user_id'");
 	$row = mysqli_fetch_assoc($result);
 	if ($row['mapped_inventory'] != 0)
@@ -3238,7 +3366,239 @@ function getItems($item_filter, $sub_system, $systemid)
 		}
 	}
 }
+function getItemsa1($item_filter, $sub_system, $systemid)
+{
+    error_log("=== START getItemsa ===");
+    error_log("getItems called with item_filter: $item_filter, sub_system: $sub_system, systemid: $systemid");
+    
+    global $discount, $unic_qty, $id, $code, $description, $w_price, $r_price, $cost, $drawer, $qty, $tt_item, $tt_qty, $unic, $pr_sr, $unic_item_code, $unic_item_list, $unic_item_list2, $is_unic_item, $conn;
+    
+    $unic_item_code = $qry_filter = '';
+    $unic_item_list = $unic = $tt_item = $tt_qty = $drawer = $qty = $r_price = $w_price = $description = $code = $id = $unic_item_list2 = $pr_sr = array();
+    $store = $_COOKIE['store'];
+    $user_id = $_COOKIE['user_id'];
+    $increment = '';
+    $decimal = getDecimalPlaces(1);
+    include('config.php');
+    
+    error_log("Store: $store, User ID: $user_id, Decimal: $decimal");
 
+    // Settings query
+    $result = mysqli_query($conn, "SELECT value FROM settings WHERE setting='discount'");
+    $row = mysqli_fetch_assoc($result);
+    $discount = $row['value'];
+    error_log("Discount setting: " . print_r($discount, true));
+    
+    // User profile query
+    $result = mysqli_query($conn, "SELECT mapped_inventory FROM userprofile WHERE id='$user_id'");
+    $row = mysqli_fetch_assoc($result);
+    error_log("Userprofile result: " . print_r($row, true));
+    if ($row['mapped_inventory'] != 0)
+        $store = $row['mapped_inventory'];
+    
+    if (isset($_COOKIE['district']))
+        $district = $_COOKIE['district'];
+    else
+        $district = 1;
+    
+    error_log("District: $district, Store after mapping: $store, Direct MKT: " . $_COOKIE['direct_mkt']);
+    
+    if ($_COOKIE['direct_mkt'] == 1)
+        $qry_filter = 'AND inq.qty>0';
+    
+    $sp_item = $sp_increment = $sp_category = $sp_catincrement = array();
+    
+    if ($item_filter == 'all') {
+        $filter_product = true;
+        $filter_service = true;
+    }
+    if ($item_filter == 1) {
+        $filter_product = true;
+        $filter_service = false;
+    }
+    if ($item_filter == 2) {
+        $filter_product = false;
+        $filter_service = true;
+    }
+    if ($item_filter == 3) {
+        $filter_product = false;
+        $filter_service = true;
+    }
+    if ($item_filter == '') {
+        $filter_product = true;
+        $filter_service = true;
+    }
+    
+    error_log("Filter Product: " . ($filter_product ? 'true' : 'false') . ", Filter Service: " . ($filter_service ? 'true' : 'false'));
+    
+    $category_filer = '';
+    if (($systemid == 13) && ($_REQUEST['action'] == 'quotation')) {
+        $category_filer = " AND itm.`category` NOT IN (SELECT `id` FROM item_category WHERE `status` IN (0))";
+        error_log("Category filter applied: $category_filer");
+    }
+
+    // District rate query
+    $query = "SELECT increment FROM district_rate WHERE `district`='$district' AND `sub_system`='$sub_system'";
+    error_log("District rate query: $query");
+    $result = mysqli_query($conn, $query);
+    while ($row = mysqli_fetch_array($result)) {
+        $increment = (100 + $row[0]) / 100;
+        error_log("Found district rate increment: " . $row[0] . "%, multiplier: $increment");
+    }
+    if ($increment == '')
+        $increment = 1;
+    
+    // Special rate query
+    $query1 = "SELECT item,increment FROM special_rate WHERE district IN ($district,0) AND `sub_system`='$sub_system'";
+    error_log("Special rate query: $query1");
+    $result1 = mysqli_query($conn, $query1);
+    while ($row1 = mysqli_fetch_array($result1)) {
+        $sp_item[] = $row1[0];
+        $sp_increment[] = $row1[1];
+        error_log("Special rate - Item: " . $row1[0] . ", Increment: " . $row1[1]);
+    }
+    
+    // Category rate query
+    $query1 = "SELECT category,increment FROM category_rate WHERE district IN ($district,0) AND `sub_system`='$sub_system'";
+    error_log("Category rate query: $query1");
+    $result1 = mysqli_query($conn, $query1);
+    while ($row1 = mysqli_fetch_array($result1)) {
+        $sp_category[] = $row1[0];
+        $sp_catincrement[] = $row1[1];
+        error_log("Category rate - Category: " . $row1[0] . ", Increment: " . $row1[1]);
+    }
+
+    if ($filter_product) {
+        $query = "SELECT itm.id,itm.code,itm.description,inq.w_price,inq.r_price,inq.c_price,inq.drawer_no,inq.qty,itm.`category`,itm.`unic`,itm.pr_sr FROM inventory_items itm, inventory_qty inq WHERE itm.id=inq.item AND inq.location='$store' AND itm.`status`=1 AND itm.pr_sr=1 $qry_filter $category_filer";
+        error_log("=== PRODUCT QUERY ===");
+        error_log($query);
+        $result = mysqli_query($conn, $query);
+        
+        if (!$result) {
+            error_log("PRODUCT QUERY ERROR: " . mysqli_error($conn));
+        } else {
+            $product_count = mysqli_num_rows($result);
+            error_log("PRODUCT QUERY returned $product_count rows");
+            
+            while ($row = mysqli_fetch_array($result)) {
+                $no_specialrate = $no_catspecialrate = true;
+                $id[] = $row[0];
+                $code[] = $row[1];
+                $description[] = $row[2];
+                $cost[] = $row[5];
+                $drawer[] = $row[6];
+                
+                if (($systemid == 1) && ($sub_system != 0) && ($row[7] > 100))
+                    $qty[] = '100+';
+                else
+                    $qty[] = $row[7];
+                
+                $unic[] = $row[9];
+                $pr_sr[] = $row[10];
+                
+                error_log("Processing Product - ID: {$row[0]}, Code: {$row[1]}, Description: {$row[2]}, W_Price: {$row[3]}, R_Price: {$row[4]}, Qty: {$row[7]}");
+                
+                for ($i = 0; $i < sizeof($sp_item); $i++) {
+                    if ($sp_item[$i] == $row[0]) {
+                        $no_specialrate = false;
+                        $calculated_w = round($row[3] * ((100 + $sp_increment[$i]) / 100), $decimal);
+                        $calculated_r = round($row[4] * ((100 + $sp_increment[$i]) / 100), $decimal);
+                        $w_price[] = $calculated_w;
+                        $r_price[] = $calculated_r;
+                        error_log("  Applied SPECIAL RATE: Increment {$sp_increment[$i]}%, W_Price: $calculated_w, R_Price: $calculated_r");
+                    }
+                }
+                
+                if ($no_specialrate) {
+                    for ($i = 0; $i < sizeof($sp_category); $i++) {
+                        if ($sp_category[$i] == $row[8]) {
+                            $no_catspecialrate = false;
+                            $calculated_w = round($row[3] * ((100 + $sp_catincrement[$i]) / 100), $decimal);
+                            $calculated_r = round($row[4] * ((100 + $sp_catincrement[$i]) / 100), $decimal);
+                            $w_price[] = $calculated_w;
+                            $r_price[] = $calculated_r;
+                            error_log("  Applied CATEGORY RATE: Increment {$sp_catincrement[$i]}%, W_Price: $calculated_w, R_Price: $calculated_r");
+                        }
+                    }
+                }
+                
+                if ($no_catspecialrate) {
+                    $calculated_w = round(($row[3] * $increment), $decimal);
+                    $calculated_r = round(($row[4] * $increment), $decimal);
+                    $w_price[] = $calculated_w;
+                    $r_price[] = $calculated_r;
+                    error_log("  Applied DEFAULT DISTRICT RATE: Multiplier $increment, W_Price: $calculated_w, R_Price: $calculated_r");
+                }
+            }
+        }
+        
+        // New stock query
+        $query3 = "SELECT itm.id,itn.qty FROM inventory_new itn, inventory_items itm WHERE itn.item=itm.id AND store='$store' $category_filer";
+        error_log("=== NEW STOCK QUERY ===");
+        error_log($query3);
+        $result3 = mysqli_query($conn, $query3);
+        
+        if (!$result3) {
+            error_log("NEW STOCK QUERY ERROR: " . mysqli_error($conn));
+        } else {
+            $new_stock_count = mysqli_num_rows($result3);
+            error_log("NEW STOCK QUERY returned $new_stock_count rows");
+            
+            while ($row3 = mysqli_fetch_array($result3)) {
+                $tt_item[] = $row3[0];
+                if (($systemid == 1) && ($sub_system != 0) && ($row3[1] > 100))
+                    $tt_qty[] = '100+';
+                else
+                    $tt_qty[] = $row3[1];
+                error_log("New Stock - Item ID: {$row3[0]}, Qty: {$row3[1]}");
+            }
+        }
+    }
+    
+    if ($filter_service) {
+        if ($item_filter == 2)
+            $qry_pr_sr = "AND itm.pr_sr='2'";
+        else if ($item_filter == 3)
+            $qry_pr_sr = "AND itm.pr_sr='3'";
+        else
+            $qry_pr_sr = "AND itm.pr_sr IN (2,3)";
+        
+        $query = "SELECT itm.id,itm.code,itm.description,itm.default_price,itm.pr_sr FROM inventory_items itm WHERE itm.`status`=1 $qry_pr_sr $category_filer";
+        error_log("=== SERVICE QUERY ===");
+        error_log($query);
+        $result = mysqli_query($conn, $query);
+        
+        if (!$result) {
+            error_log("SERVICE QUERY ERROR: " . mysqli_error($conn));
+        } else {
+            $service_count = mysqli_num_rows($result);
+            error_log("SERVICE QUERY returned $service_count rows");
+            
+            while ($row = mysqli_fetch_array($result)) {
+                $id[] = $row[0];
+                $code[] = $row[1];
+                $description[] = $row[2];
+                $cost[] = 0;
+                $drawer[] = 0;
+                $qty[] = 0;
+                $unic[] = 0;
+                $w_price[] = $row[3];
+                $r_price[] = 0;
+                $pr_sr[] = $row[4];
+                error_log("Processing Service - ID: {$row[0]}, Code: {$row[1]}, Description: {$row[2]}, Price: {$row[3]}, PR_SR: {$row[4]}");
+            }
+        }
+    }
+    
+    // Final summary
+    error_log("=== FINAL SUMMARY ===");
+    error_log("Total items loaded: " . count($id));
+    error_log("Total codes: " . count($code));
+    error_log("Total descriptions: " . count($description));
+    error_log("Sample codes (first 5): " . print_r(array_slice($code, 0, 5), true));
+    error_log("Sample descriptions (first 5): " . print_r(array_slice($description, 0, 5), true));
+    error_log("=== END getItemsa ===");
+}
 function validateBillNo()
 {
 	include('config.php');
@@ -6647,6 +7007,7 @@ function sms()
 
 function sms2($payment_id, $cust, $amount)
 {
+	global $conn2, $conn;
 	$timenow = timeNow();
 	$date_now = substr($timenow, 0, 10);
 	$sub_system = $_COOKIE['sub_system'];
@@ -7681,7 +8042,7 @@ function getInvoicePay()
 
 function addPayment($ocation)
 {
-	global $message, $cust, $bm_type, $payment_id, $invoice_no;
+	global $message, $cust, $bm_type, $payment_id, $invoice_no, $conn;
 
 	include('config.php');
 	$chque_branch_id = $tran_bnk_n = $tran_bnk_v = $storeQBID = '';
@@ -9452,7 +9813,7 @@ function newReturn($cust0, $gps_x, $gps_y)
 // updated by nirmal 08_08_2023
 function apendReturn()
 {
-	global $message, $return_invoice_no, $cust;
+	global $message, $return_invoice_no, $cust, $conn;
 	$return_invoice_no = $_REQUEST['id'];
 	$return_itemid = $_REQUEST['return_itemid'];
 	$replace_itemid = $_REQUEST['replace_itemid'];
@@ -10179,7 +10540,7 @@ function returnDetailsa()
 
 function finalizeReturn()
 {
-	global $message;
+	global $message, $conn;
 	$id = $_GET['id'];
 	include('config.php');
 	$query = "UPDATE `return_main` SET `status`='2' WHERE `invoice_no`='$id'";

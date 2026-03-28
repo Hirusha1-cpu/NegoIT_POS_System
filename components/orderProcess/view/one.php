@@ -267,14 +267,14 @@ if (isset($_REQUEST['id'])) {
 						</td>
 					</tr>
 					<tr style="background-color:#F0F0F0">
-						<td style="padding-left:20px;"><?php print ucfirst($bi_seen_by); ?></td>
+						<td style="padding-left:20px;"><?php print ucfirst($bi_seen_by  ?? ''); ?></td>
 						<?php if (isOdrCrossCheckActive()) { ?>
-							<td style="padding-left:20px;"><?php print ucfirst($bi_cross_checked_by); ?></td>
+							<td style="padding-left:20px;"><?php print ucfirst($bi_cross_checked_by  ?? ''); ?></td>
 						<?php } ?>
-						<td style="padding-left:20px;"><?php print ucfirst($bi_packed_by); ?></td>
+						<td style="padding-left:20px;"><?php print ucfirst($bi_packed_by  ?? ''); ?></td>
 						<?php if ($systemid != 13 || $sub_system != 1) { ?>
-							<td style="padding-left:20px;"><?php print ucfirst($bi_shipped_by); ?></td><?php } ?>
-						<td style="padding-left:20px;"><?php print ucfirst($bi_deliverd_by); ?></td>
+							<td style="padding-left:20px;"><?php print ucfirst($bi_shipped_by  ?? ''); ?></td><?php } ?>
+						<td style="padding-left:20px;"><?php print ucfirst($bi_deliverd_by  ?? ''); ?></td>
 					</tr>
 					<tr style="background-color:#F0F0F0">
 						<td style="padding-left:20px;"><?php print $bi_seen_date . '<br/>' . $bi_seen_time; ?></td>

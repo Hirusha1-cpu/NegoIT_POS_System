@@ -437,7 +437,7 @@ function addSupplier(){
 // new code added by nirmal 18_12_2024
 function addSupplier()
 {
-	global $message;
+	global $message, $conn;
 	$sup_name = $_REQUEST['sup_name'];
 	$email = $_REQUEST['email'];
 	$tel1 = $_REQUEST['tel1'];
@@ -471,8 +471,8 @@ function addSupplier()
 			}
 
 			// Insert main account for the supplier
-			$query2 = "INSERT INTO `accounts` (`name`,`category`,`bank_ac`,`payment_ac`,`system_ac`,`status`)
-					   VALUES ('$sup_name','24','0','0','1','1')";
+			$query2 = "INSERT INTO `accounts` (`name`,`category`,`bank_ac`,`payment_ac`,`system_ac`,`status`,`processing_fee`)
+					   VALUES ('$sup_name','24','0','0','1','1','0')";
 			$result2 = mysqli_query($conn, $query2);
 			$last_account_id = mysqli_insert_id($conn);
 
@@ -482,8 +482,8 @@ function addSupplier()
 
 			// Insert discount account if applicable
 			if ($dis) {
-				$query2 = "INSERT INTO `accounts` (`name`,`category`,`bank_ac`,`payment_ac`,`system_ac`,`status`)
-						   VALUES ('Dis-$sup_name','11','0','0','1','1')";
+				$query2 = "INSERT INTO `accounts` (`name`,`category`,`bank_ac`,`payment_ac`,`system_ac`,`status`,`processing_fee`)
+						   VALUES ('Dis-$sup_name','11','0','0','1','1','0')";
 				$result2 = mysqli_query($conn, $query2);
 				$last_dis_account_id = mysqli_insert_id($conn);
 

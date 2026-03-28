@@ -402,17 +402,17 @@ if ($type == 4) {
 					<td>&nbsp;&nbsp;'.$cat_name[$i].'&nbsp;&nbsp;</td>
 					<td>&nbsp;&nbsp;'.$code[$i].'&nbsp;&nbsp;</td>
 					<td>&nbsp;&nbsp;'.$description[$i].'&nbsp;&nbsp;</td>
-					<td align="right">&nbsp;&nbsp;'.number_format($w_price[$i],$decimal).'&nbsp;&nbsp;</td>';
+					<td align="right">&nbsp;&nbsp;'.number_format($w_price[$i] ?? 0,$decimal).'&nbsp;&nbsp;</td>';
 					if($type==2 || $type==3){
-					print '<td align="right">&nbsp;&nbsp;'.number_format($cost[$i],$decimal).'&nbsp;&nbsp;</td>
+					print '<td align="right">&nbsp;&nbsp;'.number_format($cost[$i] ?? 0,$decimal).'&nbsp;&nbsp;</td>
 					<td align="center">&nbsp;&nbsp;'.$st_name[$i].'&nbsp;&nbsp;</td>
 					</tr>';
 					}else{
-						print '<td align="right">&nbsp;&nbsp;'.number_format($r_price[$i],$decimal).'&nbsp;&nbsp;</td>
-								<td align="right">&nbsp;&nbsp;'.number_format($cost[$i],$decimal).'&nbsp;&nbsp;</td>
+						print '<td align="right">&nbsp;&nbsp;'.number_format($r_price[$i] ?? 0,$decimal).'&nbsp;&nbsp;</td>
+								<td align="right">&nbsp;&nbsp;'.number_format($cost[$i] ?? 0,$decimal).'&nbsp;&nbsp;</td>
 								<td align="center">'.$drawer[$i].'</td>
-								<td align="right">&nbsp;&nbsp;'.number_format($qty[$i]).'&nbsp;&nbsp;</td>
-								<td align="right">&nbsp;&nbsp;'.number_format($cost[$i]*$qty[$i]).'&nbsp;&nbsp;</td>
+								<td align="right">&nbsp;&nbsp;'.number_format($qty[$i] ?? 0).'&nbsp;&nbsp;</td>
+								<td align="right">&nbsp;&nbsp;'.number_format(($cost[$i] ?? 0)*$qty[$i]).'&nbsp;&nbsp;</td>
 								<td align="center">&nbsp;&nbsp;'.$st_name[$i].'&nbsp;&nbsp;</td>
 						</tr>';
 					}
@@ -420,7 +420,7 @@ if ($type == 4) {
 				if(!($type==2 || $type==3))
 				print '<tr bgcolor="#DDDDDD">
 					<td align="center" colspan="7"><strong>&nbsp;&nbsp;TOTAL COST OF ITEMS</strong></td>
-					<td align="right"><strong>&nbsp;&nbsp;'.number_format($total_c_price,$decimal).'&nbsp;&nbsp;</strong></td>
+					<td align="right"><strong>&nbsp;&nbsp;'.number_format($total_c_price ?? 0,$decimal).'&nbsp;&nbsp;</strong></td>
 				</tr>';
 			?>
 		</table>

@@ -3056,7 +3056,7 @@ function getCustSale($systemid)
 		$payment_cash, $payment_card, $payment_chque, $payment_id, $payment_amount, $payment_type, $payment_salesman, $payment_date, $payment_time,
 		$payment_store, $credit_balance, $payment_chq_return, $chqpayment_id, $chqpayment_amount, $chqpayment_salesman, $chqpayment_cust, $chqrtn_date,
 		$chqrtn_time, $chqpayment_store, $chqpayment_invno, $chq_details, $payment_card_details, $payment_chq_details, $chqrtn_chq_details, $payment_bank,
-		$payment_card_tr, $payment_bank_tr, $bank_trans, $payment_invoice, $payment_chq_postpone, $billed_chq_return, $billed_chq_postpone, $cust_mtype;
+		$payment_card_tr, $payment_bank_tr, $bank_trans, $payment_invoice, $payment_chq_postpone, $billed_chq_return, $billed_chq_postpone, $cust_mtype, $conn2;
 
 	$invoice_no = $payment_id = $invoice_Total = $payment_cash = $payment_card = $payment_chque = $billed_date = $payment_date = $chqrtn_date = $chqpayment_id = $payment_invoice = $payment_card_details = $payment_chq_details = array();
 	$acc_arr = $py_inv_no = $py_type = $py_amount = $py_chq_no = $py_bnk_code = $py_chq_br = $py_chq_date = $py_bnk_name = $py_bnk_trans = $py_chq_rtn = $py_chq_ppone = $py_card_no = array();
@@ -4757,7 +4757,7 @@ ORDER BY store_name, MAX(bi.`date`) DESC";
 function getSalesReport2($sub_system)
 {
 	global $item_des, $item_qty, $selection, $customer, $customer_id, $store1, $fromdate, $todate, $category, $cat2_id, $cat2_name, $cat2_total_count,
-		$cat2_sold_total, $salesman, $item_price, $group_by, $item_is_duplicate;
+		$cat2_sold_total, $salesman, $item_price, $group_by, $item_is_duplicate, $conn2;
 	$k = 0;
 	$case = false;
 	$store = $_COOKIE['store'];
@@ -4815,6 +4815,7 @@ function getSalesReport2($sub_system)
 		include('config.php');
 		if ($selection == 'customer') {
 			$query = "SELECT cu.`name` FROM cust cu WHERE cu.id='$customer_id'";
+			$result = mysqli_query($conn2, $query);
 			$row = mysqli_fetch_row(mysqli_query($conn2, $query));
 			if ($result && mysqli_num_rows($result) > 0) {
 				$customer = $row[0];
@@ -4823,21 +4824,38 @@ function getSalesReport2($sub_system)
 			}
 		}
 
+		// if ($selection == 'customer') {
+		// 	if ((isset($_REQUEST["components"]) && ($_REQUEST['components'] == 'bill2')) && (inf_systemid(1) == 24)) { // logged store billed item data only
+		// 		$query = "SELECT itm.description,SUM(bi.qty),bi.`unit_price`
+		// 		FROM bill_main bm, bill bi, inventory_items itm
+		// 		WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.store = '$store' AND bm.`status` NOT IN (0,7)
+		// 		AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry AND bm.`status` NOT IN (0,7)
+		// 		AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
+		// 		$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item $price_group_qry ORDER BY itm.description";
+		// 	} else {
+		// 		$query = "SELECT itm.description,SUM(bi.qty),bi.`unit_price`
+		// 		FROM bill_main bm, bill bi, inventory_items itm
+		// 		WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.`status` NOT IN (0,7)
+		// 		AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry
+		// 		AND bm.`status` NOT IN (0,7) AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
+		// 		$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item $price_group_qry ORDER BY itm.description";
+		// 	}
+		// }
 		if ($selection == 'customer') {
-			if ((isset($_REQUEST["components"]) && ($_REQUEST['components'] == 'bill2')) && (inf_systemid(1) == 24)) { // logged store billed item data only
-				$query = "SELECT itm.description,SUM(bi.qty),bi.`unit_price`
-				FROM bill_main bm, bill bi, inventory_items itm
-				WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.store = '$store' AND bm.`status` NOT IN (0,7)
-				AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry AND bm.`status` NOT IN (0,7)
-				AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
-				$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item $price_group_qry ORDER BY itm.description";
+			if ((isset($_REQUEST["components"]) && ($_REQUEST['components'] == 'bill2')) && (inf_systemid(1) == 24)) {
+				$query = "SELECT itm.description, SUM(bi.qty), bi.unit_price
+						FROM bill_main bm, bill bi, inventory_items itm
+						WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.store = '$store' AND bm.`status` NOT IN (0,7)
+						AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry AND bm.`status` NOT IN (0,7)
+						AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
+						$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item, bi.unit_price ORDER BY itm.description";
 			} else {
-				$query = "SELECT itm.description,SUM(bi.qty),bi.`unit_price`
-				FROM bill_main bm, bill bi, inventory_items itm
-				WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.`status` NOT IN (0,7)
-				AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry
-				AND bm.`status` NOT IN (0,7) AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
-				$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item $price_group_qry ORDER BY itm.description";
+				$query = "SELECT itm.description, SUM(bi.qty), bi.unit_price
+						FROM bill_main bm, bill bi, inventory_items itm
+						WHERE bm.invoice_no=bi.invoice_no AND bi.item=itm.id AND bm.`status` NOT IN (0,7)
+						AND bm.`lock`=1 AND itm.description!='CHQUE' AND itm.description!='CREDIT' $cust_qry
+						AND bm.`status` NOT IN (0,7) AND bm.exclude=0 AND date(bm.`billed_timestamp`) BETWEEN '$fromdate' AND '$todate'
+						$cat_qry $sub_system_qry $salesman_qry GROUP BY bi.item, bi.unit_price ORDER BY itm.description";
 			}
 		}
 		if ($selection == 'store') {
@@ -5777,6 +5795,7 @@ function getUnicItems()
 
 function snLookupList()
 {
+	global $conn;
 	$data_list = '';
 	include('config.php');
 	if ((isset($_POST['item_desc'])) || (isset($_POST['item_sn']))) {

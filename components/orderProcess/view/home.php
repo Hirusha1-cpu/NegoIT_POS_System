@@ -299,25 +299,46 @@ for ($i = 0; $i < sizeof($bi_item_id); $i++) {
 				$color2 = 'red';
 			else
 				$color2 = 'black';
+			// print '<tr style="background-color:#F0F0F0">
+			// 			<td align="center">' . sprintf('%02d', ($i + 1)) . '</td>
+			// 			<th>
+			// 				<input type="checkbox" id="tag_' . $bi_invoice_no[$i] . '" />
+			// 			</th>
+			// 			<td align="center">
+			// 				<a href="index.php?components=order_process&action=' . $action0 . '&id=' . $bi_invoice_no[$i] . '">' . str_pad($bi_invoice_no[$i], 7, "0", STR_PAD_LEFT) . '</a>
+			// 			</td>
+			// 			<td style="padding: 0px 10px;">' . $bi_district[$i] . '</td>
+			// 			<td style="padding: 0px 10px;">' . $bi_cust[$i] . '</td>
+			// 			<td style="padding: 0px 10px; color:' . $color2 . '">' . $bm_store[$i] . '</td>
+			// 			<td style="padding: 0px 10px;">' . ucfirst($bi_billed_by[$i]) . '</td>
+			// 			<td align="center">
+			// 				<a style="cursor:pointer; color:blue;" title="Time: ' . substr($bi_billed_time[$i], 0, 5) . '">' . $bi_billed_date[$i] . '</a>
+			// 			</td>
+			// 			<td style="padding: 0px 10px;">' . ucfirst($bi_seen_by[$i]) . '</td>
+			// 			<td align="center">
+			// 			<a style="cursor:pointer; color:blue;" title="Time: ' . substr($bi_seen_time[$i], 0, 5) . '">' . $bi_seen_date[$i] . '</a>
+			// 			</td>' . $td_status . '
+			// 		</tr>';
 			print '<tr style="background-color:#F0F0F0">
-						<td align="center">' . sprintf('%02d', ($i + 1)) . '</td>
-						<th>
-							<input type="checkbox" id="tag_' . $bi_invoice_no[$i] . '" />
-						</th>
-						<td align="center">
-							<a href="index.php?components=order_process&action=' . $action0 . '&id=' . $bi_invoice_no[$i] . '">' . str_pad($bi_invoice_no[$i], 7, "0", STR_PAD_LEFT) . '</a>
-						</td>
-						<td style="padding: 0px 10px;">' . $bi_district[$i] . '</td>
-						<td style="padding: 0px 10px;">' . $bi_cust[$i] . '</td>
-						<td style="padding: 0px 10px; color:' . $color2 . '">' . $bm_store[$i] . '</td>
-						<td style="padding: 0px 10px;">' . ucfirst($bi_billed_by[$i]) . '</td>
-						<td align="center">
-							<a style="cursor:pointer; color:blue;" title="Time: ' . substr($bi_billed_time[$i], 0, 5) . '">' . $bi_billed_date[$i] . '</a>
-						</td>
-						<td style="padding: 0px 10px;">' . ucfirst($bi_seen_by[$i]) . '</td>
-						<td align="center"><a style="cursor:pointer; color:blue;" title="Time: ' . substr($bi_seen_time[$i], 0, 5) . '">' . $bi_seen_date[$i] . '</a>
-						</td>' . $td_status . '
-					</tr>';
+				<td align="center">' . sprintf('%02d', ($i + 1)) . '</td>
+				<th>
+					<input type="checkbox" id="tag_' . $bi_invoice_no[$i] . '" />
+				</th>
+				<td align="center">
+					<a href="index.php?components=order_process&action=' . $action0 . '&id=' . $bi_invoice_no[$i] . '">' . str_pad($bi_invoice_no[$i], 7, "0", STR_PAD_LEFT) . '</a>
+				</td>
+				<td style="padding: 0px 10px;">' . $bi_district[$i] . '</td>
+				<td style="padding: 0px 10px;">' . $bi_cust[$i] . '</td>
+				<td style="padding: 0px 10px; color:' . $color2 . '">' . $bm_store[$i] . '</td>
+				<td style="padding: 0px 10px;">' . ucfirst($bi_billed_by[$i]) . '</td>
+				<td align="center">
+					<a style="cursor:pointer; color:blue;" title="Time: ' . ($bi_billed_time[$i] ? substr($bi_billed_time[$i], 0, 5) : '') . '">' . $bi_billed_date[$i] . '</a>
+				</td>
+				<td style="padding: 0px 10px;">' . ucfirst($bi_seen_by[$i]) . '</td>
+				<td align="center">
+					<a style="cursor:pointer; color:blue;" title="Time: ' . ($bi_seen_time[$i] ? substr($bi_seen_time[$i], 0, 5) : '') . '">' . $bi_seen_date[$i] . '</a>
+				</td>' . $td_status . '
+			</tr>';
 		}
 	} else if ($action == 'list_my') {
 		for ($i = 0; $i < sizeof($bi_invoice_no); $i++) {
