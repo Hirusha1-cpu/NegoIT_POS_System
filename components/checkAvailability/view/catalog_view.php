@@ -1,0 +1,59 @@
+<?php
+                include_once  'template/header.php';
+?>
+	<link rel="stylesheet" href="plugin/jquery/css/jquery.ui.all.css" />
+	<script src="plugin/jquery/js/jquery-1.8.0.js"></script>
+	<script src="plugin/jquery/ui/jquery.ui.core.js"></script>
+	<script src="plugin/jquery/ui/jquery.ui.widget.js"></script>
+	<script src="plugin/jquery/ui/jquery.ui.position.js"></script>
+	<script src="plugin/jquery/ui/jquery.ui.autocomplete.js"></script>
+	<link rel="stylesheet" href="plugin/jquery/css/demos.css" />
+<!-- ------------------------------------------------------------------------------- -->
+<?php if($direct_mkt==0){ ?>
+	<input type="hidden" name="components" value="<?php print $components; ?>" />
+	<input type="hidden" name="action" value="catalog" />
+	<input type="hidden" id="cust_id" name="cust_id" value="<?php print $cust_id; ?>" />
+	<input type="hidden" id="item_id" name="item_id" value="" />
+	<table align="center" style="font-family:Calibri; font-size:11pt; border-radius:10px;" bgcolor="#EEEEEE">
+	<tr><td width="60px" align="center" style="font-size:8pt" title="Show All Items Even though No Stock Available">Show All<br /><input type="checkbox" name="show_all" id="show_all" <?php print $show_all; ?> /></td><td><strong>District</strong></td><td>
+		<select id="district" name="district" >
+		<option value="">-SELECT-</option>
+		<?php for($i=0;$i<sizeof($district_id);$i++){
+			if($district_id[$i]==$district) $select2='selected="selected"'; else $select2='';
+			print '<option value="'.$district_id[$i].'" '.$select2.'>'.$district_name[$i].'</option>';
+		} ?>
+		</select>
+	</td><td width="50px"></td>
+	<td><strong>From Date</strong><br />
+	<strong>To Date</strong></td><td><input type="date" id="from_date" name="from_date" value="<?php print $from_date; ?>" /><br />
+	<input type="date" id="to_date" name="to_date" value="<?php print $to_date; ?>" />
+	</td><td width="50px"></td>
+	<td><strong>Customer</strong><br />
+	<strong>Item</strong></td><td><input type="text" id="tags1" name="cust" value="<?php if(isset($_REQUEST['cust'])) print $_REQUEST['cust']; ?>" onclick="this.value=''" /><br />
+	<input type="text" id="tags2" name="item" value="<?php print $item_desc; ?>" onclick="this.value=''" />
+	</td><td width="50px"></td>
+	<td align="center"><input type="button" value="Submit" onclick="filterData()" style="width:100px; height:40px" /></td></tr>
+	</table>
+
+<?php }else{ ?>
+	<input type="hidden" id="cust_id" value="0" />
+	<input type="hidden" id="tags1" value="0" />
+	<input type="hidden" id="district" value="9" />
+<?php } ?>
+
+
+	<?php
+		include_once  'components/checkAvailability/view/tpl/catalog.php';
+	?>
+<table align="center" style="font-size:8pt"><tr><td align="center">
+<div style="background-color:#6699FF; border:medium; border-color:black; width:80px;">
+	<a class="shortcut-button" onclick="printdiv('print','printheader')" href="#"><span style="text-decoration:none; font-family:Arial; color:navy;">
+	<img src="images/print.png" alt="icon" /><br />
+	Print
+	</span></a>
+</div>
+</td></tr></table>
+
+<?php
+                include_once  'template/footer.php';
+?>
