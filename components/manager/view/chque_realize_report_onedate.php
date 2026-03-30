@@ -170,7 +170,7 @@
 		<tr>
 			<th colspan="5" align="center">Total Amount</th>
 			<th align="right" style="padding-right:10px">
-				<?php print number_format($chque_total); ?>
+				<?php print number_format($chque_total ?? 0); ?>
 			</th>
 			<td colspan="3"></td>
 		</tr>

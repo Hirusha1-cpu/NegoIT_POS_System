@@ -47,10 +47,11 @@ $decimal = getDecimalPlaces(1);
 <!-- --------------------------Print Start-------------------------- -->
 <?php
 if (isset($_REQUEST['message'])) {
-	if ($_REQUEST['re'] == 'success')
-		$color = 'green';
-	else
-		$color = '#DD3333';
+	// if ($_REQUEST['re'] == 'success')
+	// 	$color = 'green';
+	// else
+	// 	$color = '#DD3333';
+	$color = isset($_REQUEST['re']) && $_REQUEST['re'] == 'success' ? 'green' : '#DD3333';
 	print '<script type="text/javascript">document.getElementById("notifications").innerHTML=' . "'" . '<span style="color:' . $color . '; font-weight:bold;font-size:12pt;">' . $_REQUEST['message'] . '</span>' . "'" . ';</script>';
 }
 ?>
@@ -196,7 +197,7 @@ if (isset($_REQUEST['message'])) {
 											<td class="shipmentTB2">' . $ms2_des[$i] . '</td>
 											<td class="shipmentTB2" align="right">' . number_format($ms2_qty[$i] * $ms2_c_price[$i], $decimal) . '</td>';
 							if ($ms2_unic[$i] == 1) {
-								print '<td class="shipmentTB2" align="right">' . number_format($sm3_soldprice[$i], $decimal) . '</td>
+								print '<td class="shipmentTB2" align="right">' . number_format($sm3_soldprice[$i] ?? 0, $decimal) . '</td>
 												<td class="shipmentTB2" align="right">' . $sm3_soldqty[$i] . ' / ' . $ms2_qty[$i] . '</td>
 												</tr>';
 								$total_earnings += $sm3_soldprice[$i];

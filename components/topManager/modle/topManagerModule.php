@@ -1,7 +1,7 @@
 <?php
 
 function getSubSystems(){
-	global $sub_system_list,$sub_system_names;
+	global $sub_system_list,$sub_system_names, $conn;
 	include('config.php');
 	$query="SELECT id,name FROM sub_system WHERE `status`=1 AND id!=0";
 	$result=mysqli_query($conn,$query);
@@ -156,7 +156,7 @@ function setStatusPayment(){
 }
 
 function getPaymentHistory(){
-global $sub_system1,$from_date,$to_date,$payment_id,$ps_amount,$ps_type,$ps_chque_no,$ps_chque_bank,$ps_chque_branch,$ps_chque_date,$ps_chque_return_date,$ps_submited_by,$ps_submited_date,$ps_processed_by,$ps_processed_date,$ps_status,$ps_status_code,$ps_cust_chq,$ps_sub_system;
+global $sub_system1,$from_date,$to_date,$payment_id,$ps_amount,$ps_type,$ps_chque_no,$ps_chque_bank,$ps_chque_branch,$ps_chque_date,$ps_chque_return_date,$ps_submited_by,$ps_submited_date,$ps_processed_by,$ps_processed_date,$ps_status,$ps_status_code,$ps_cust_chq,$ps_sub_system, $conn;
 	$sub_system_qry="";
 	if(isset($_GET['from_date'])&&isset($_GET['to_date'])&&isset($_GET['sub_system'])){
 		$from_date=$_GET['from_date'];

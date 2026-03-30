@@ -539,6 +539,7 @@ function processInventoryNew($item, $lastitem, $store, $table)
 
 function calculateDiscount($cust, $itemid, $price, $discount_value, $discount_type)
 {
+	global $conn;
 	include('config.php');
 	$query = "SELECT `status` FROM cust WHERE id='$cust'";
 	$row = mysqli_fetch_row(mysqli_query($conn, $query));

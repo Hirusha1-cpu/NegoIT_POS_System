@@ -55,7 +55,7 @@ function getGroup()
 function getItems()
 {
 	global $itm_id, $itm_desc, $itm_supplier, $inv_store_qty, $inv_all_qty, $sold_store_qty, $sold_all_qty, $store_id2, $store_name2,
-	$inv_store2_qty, $qty_list, $group_stores, $transferred_qty;
+	$inv_store2_qty, $qty_list, $group_stores, $transferred_qty, $conn2;
 	$group_stores = $itm_id = array();
 	include('config.php');
 
@@ -208,7 +208,7 @@ function getItems()
 // update by nirmal 06_11_2023
 function getItems2($sub_system)
 {
-	global $itm_id, $itm_desc;
+	global $itm_id, $itm_desc, $conn;
 	$systemid = inf_systemid(1);
 	include('config.php');
 
@@ -373,7 +373,7 @@ function getSupplier()
 
 function getOneSupplier($mode)
 {
-	global $sup_id, $sup_name, $sup_email, $sup_tel1, $sup_tel2, $sup_address, $sup_country, $sup_status;
+	global $sup_id, $sup_name, $sup_email, $sup_tel1, $sup_tel2, $sup_address, $sup_country, $sup_status, $conn;
 	$id = $_REQUEST['id'];
 	if ($mode == 'id')
 		$mode1 = "id='$id'";
@@ -597,7 +597,7 @@ function updateSupplier()
 
 function setStatusSupplier()
 {
-	global $message;
+	global $message, $conn;
 	$sup_name = $_REQUEST['status'];
 	$id = $_REQUEST['id'];
 	if ($sup_name == 'on') {
@@ -783,7 +783,7 @@ function listPO($limit, $sub_system)
 // updated by nirmal 04_10_2023
 function onePO()
 {
-	global $po_id, $po_item, $po_qty, $po_cost, $po_date, $po_user, $po_category, $po_status, $supplier;
+	global $po_id, $po_item, $po_qty, $po_cost, $po_date, $po_user, $po_category, $po_status, $supplier, $conn;
 	$id = $_GET['id'];
 	include('config.php');
 	$query1 = "SELECT po.id,po.item_description,po.qty,po.c_price,po.`date`,up.username,itc.name FROM purchaseoder po, userprofile up, inventory_items itm, item_category itc WHERE po.added_by=up.id AND po.item=itm.id AND itm.category=itc.id AND po.po_number='$id' ORDER BY itc.name";
@@ -810,7 +810,7 @@ function onePO()
 // update by nirmal 06_11_2023
 function createPO($sub_system)
 {
-	global $message, $po_no;
+	global $message, $po_no, $conn;
 	$out = true;
 	$supplier = $_POST['supplier'];
 	$timenow = timeNow();
@@ -840,7 +840,7 @@ function createPO($sub_system)
 // update by nirmal 03_10_2023
 function appendPO()
 {
-	global $message, $po_no;
+	global $message, $po_no, $conn;
 	$po_no = $_GET['po'];
 	$timenow = timeNow();
 	$user = $_COOKIE['user_id'];
@@ -923,7 +923,7 @@ function appendPO()
 
 function updatePO()
 {
-	global $message, $po_no;
+	global $message, $po_no, $conn;
 	$po_no = $_POST['po_no'];
 	$timenow = timeNow();
 	$user = $_COOKIE['user_id'];
@@ -969,7 +969,7 @@ function removeItemPO()
 
 function lockPO()
 {
-	global $message;
+	global $message, $conn;
 	$po_no = $_GET['po_no'];
 	include('config.php');
 	$query = "UPDATE `purchaseoder_main` SET `status`='1' WHERE `po_number`='$po_no'";
@@ -985,7 +985,7 @@ function lockPO()
 
 function unlockPO()
 {
-	global $message;
+	global $message, $conn;
 	$po_no = $_GET['po_no'];
 	include('config.php');
 
@@ -1014,6 +1014,7 @@ function unlockPO()
 // update by nirmal 06_11_2023
 function downloadPO($systemid)
 {
+	global $conn;
 	$po_no = $_GET['id'];
 	$store_id = $_GET['store_id'];
 	$user = $_COOKIE['user'];

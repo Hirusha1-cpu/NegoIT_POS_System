@@ -86,6 +86,7 @@
 		<?php }
 		if($po_status==0) $disable=''; else $disable='disabled="disabled"';
 		$cat='';
+		if(isset($po_id) && is_array($po_id) && count($po_id) > 0) {
 		for($i=0;$i<sizeof($po_id);$i++){
 			if($cat!=$po_category[$i]){
 				if($cat!='')
@@ -110,7 +111,10 @@
 					<td>&nbsp;&nbsp;'.ucfirst($po_user[$i]).'&nbsp;&nbsp;</td>
 					<td align="right" >&nbsp;&nbsp;'.number_format($po_cost[$i], $decimal).'&nbsp;&nbsp;</td>
 				</tr>';
-		} ?>
+		} } else {
+			print '<tr><td colspan="9" align="center" bgcolor="#EEEEEE">No items added to this PO yet</td></tr>';
+		}
+		?>
  		<tr>
 			<td  bgcolor="#EEEEEE" colspan="4" align="center">
 				<?php

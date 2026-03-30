@@ -25,7 +25,7 @@ function loanInstallment($PV, $r, $n)
 // update by nirmal 16_11_23
 function getExpenseFormData()
 {
-	global $st_id, $st_name, $ac_id, $ac_name, $ac_type, $fromac_id, $fromac_name, $py_id, $py_name, $cu_id, $cu_name, $su_id, $su_name, $up_id, $up_name, $method_id, $method_name;
+	global $st_id, $st_name, $ac_id, $ac_name, $ac_type, $fromac_id, $fromac_name, $py_id, $py_name, $cu_id, $cu_name, $su_id, $su_name, $up_id, $up_name, $method_id, $method_name, $conn;
 
 	$st_id = $ac_id = $fromac_id = $py_id = $py_name = $cu_id = $su_id = $up_id = $method_id = array();
 	$user = $_COOKIE['user_id'];
@@ -1007,7 +1007,7 @@ function getParentAccountsAjax()
 // update by nirmal 21_11_22
 function getCahrtOfAccounts()
 {
-	global $ac_id, $ac_name, $ac_system, $ac_status, $category_L1, $category_L2, $category_L3, $ac_parent_id;
+	global $ac_id, $ac_name, $ac_system, $ac_status, $category_L1, $category_L2, $category_L3, $ac_parent_id, $conn;
 	$component = $_REQUEST['components'];
 	$user = $_COOKIE['user_id'];
 	$filter_accounts = $table = "";
@@ -1533,7 +1533,7 @@ function date_sort($a, $b)
 // update by nirmal 15_10_2024 (fixed sql error (selecting wrong table of transfer)
 function getAccountHistory()
 {
-	global $account_name, $date, $id_list, $type, $payee, $dr, $cr, $from_date, $to_date, $statting_balance, $group;
+	global $account_name, $date, $id_list, $type, $payee, $dr, $cr, $from_date, $to_date, $statting_balance, $group, $conn;
 	$id = $_GET['id'];
 	if (isset($_GET['from_date']))
 		$from_date = $_GET['from_date'];
@@ -3324,7 +3324,7 @@ function deleteLoan()
 //---------------------------------------Dashboard--------------------------------------------//
 function dashboard()
 {
-	global $backdate30, $today, $supplier_name, $supplier_remaining, $expense_account, $expense_amount, $supinv_name, $supinv_shipno, $supinv_invno, $supinv_invdate, $supinv_duedate, $supinv_amount;
+	global $backdate30, $today, $supplier_name, $supplier_remaining, $expense_account, $expense_amount, $supinv_name, $supinv_shipno, $supinv_invno, $supinv_invdate, $supinv_duedate, $supinv_amount, $conn;
 
 	$backdate30 = date("Y-m-d", time() - 2592000);
 	$today = dateNow();

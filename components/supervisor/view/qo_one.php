@@ -351,10 +351,10 @@
 										print '</div>
 												<br />
 											</td>
-											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_qty[$i]).'</td>
-											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_tmp_invoiced_qty[$i]).'</td>
-											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_invoiced_qty[$i]).'</td>
-											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_filled_qty[$i]).'</td>
+											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_qty[$i] ?? 0).'</td>
+											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_tmp_invoiced_qty[$i] ?? 0).'</td>
+											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_invoiced_qty[$i] ?? 0).'</td>
+											<td style="border-bottom:0; border-top:0; padding:5px;" align="right" '.$color1.'>'.number_format($qi_filled_qty[$i] ?? 0).'</td>
 										</tr>';
 										$total_discount+=$qi_qty[$i]*$qi_discount[$i];
 								}

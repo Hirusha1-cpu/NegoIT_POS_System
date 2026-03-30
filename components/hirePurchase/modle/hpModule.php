@@ -61,10 +61,30 @@ ORDER BY customer_name";
 }
 
 function paymentDateIssueList($user_id){
-global $issue_list1,$issue_list2,$issue_list3;
+global $issue_list1,$issue_list2,$issue_list3, $conn2;
 	$hp_schedule=$issue_list1=$issue_list2=$issue_list3=array();
 	include('config.php');
-	$query="SELECT bm.invoice_no,his.cal_start_date,ht.`name`,his.`day`,his.payment_count FROM hp_inv_schedule his, hp_schedule_type ht, hp_payments hp, bill_main bm WHERE his.`type`=ht.id AND his.id=hp.`schedule` AND bm.invoice_no=hp.invoice_no AND bm.`lock`=1 AND bm.`status`!=0 AND his.`status`='1' GROUP BY bm.invoice_no";
+	// $query="SELECT bm.invoice_no,his.cal_start_date,ht.`name`,his.`day`,his.payment_count FROM hp_inv_schedule his, hp_schedule_type ht, hp_payments hp, bill_main bm WHERE his.`type`=ht.id AND his.id=hp.`schedule` AND bm.invoice_no=hp.invoice_no AND bm.`lock`=1 AND bm.`status`!=0 AND his.`status`='1' GROUP BY bm.invoice_no";
+	$query = "SELECT bm.invoice_no,
+                 his.cal_start_date,
+                 ht.name,
+                 his.day,
+                 his.payment_count 
+          FROM hp_inv_schedule his, 
+               hp_schedule_type ht, 
+               hp_payments hp, 
+               bill_main bm 
+          WHERE his.type = ht.id 
+            AND his.id = hp.schedule 
+            AND bm.invoice_no = hp.invoice_no 
+            AND bm.lock = 1 
+            AND bm.status != 0 
+            AND his.status = '1' 
+          GROUP BY bm.invoice_no, 
+                   his.cal_start_date, 
+                   ht.name, 
+                   his.day, 
+                   his.payment_count";
 	$result=mysqli_query($conn2,$query);
 	while($row=mysqli_fetch_array($result)){
 		$bm_invoice_no=$row[0];

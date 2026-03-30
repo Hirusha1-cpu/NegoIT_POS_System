@@ -105,19 +105,38 @@ function validateCommissionReport(){
 	<tr style="background-color:#467898; color:white;"><th class="shipmentTB3" rowspan="2">Invoice No</th><th class="shipmentTB3" rowspan="2">Customer</th><th class="shipmentTB3" colspan="2">Salesman</th><th class="shipmentTB3" colspan="2">Recovery Agent</th><th class="shipmentTB3" rowspan="2">Recovery Total</th><th class="shipmentTB3" rowspan="2">Invoice Total</th></tr>
 	<tr style="background-color:#467898; color:white;"><th class="shipmentTB3" >Name<br /><span style="font-size:8pt"><input type="checkbox" id="sm_order" onclick="setOrder('sm')" <?php if($sm_order) print 'checked="checked"'; ?> /> Order</span></th><th class="shipmentTB3">Commission<br /><span style="font-size:8pt"><?php print $sm_rate; ?></span></th><th class="shipmentTB3">Name<br /><span style="font-size:8pt"><input type="checkbox" id="rg_order" onclick="setOrder('rg')" <?php if($rg_order) print 'checked="checked"'; ?> /> Order</span></th><th class="shipmentTB3">Commission<br /><span style="font-size:8pt"><?php print $rg_rate; ?></span></th></tr>
 	<?php
-	for($i=0;$i<sizeof($his_id);$i++){
-		if(strlen($his_cust[$i])>25) $cust_name=substr($his_cust[$i],0,25).'...'; else $cust_name=$his_cust[$i];
-		if($his_sm_pay[$i]==0) $sm_commission=$sm_rate; else $sm_commission=0;
-		if($his_rg_pay[$i]==0) $rg_commission=$rg_rate; else $rg_commission=0;
-		$sm_commission_arr[$his_sm[$i]]+=$sm_commission;
-		$rg_commission_arr[$his_rg[$i]]+=$rg_commission;
+	// for($i=0;$i<sizeof($his_id);$i++){
+	// 	if(strlen($his_cust[$i])>25) $cust_name=substr($his_cust[$i],0,25).'...'; else $cust_name=$his_cust[$i];
+	// 	if($his_sm_pay[$i]==0) $sm_commission=$sm_rate; else $sm_commission=0;
+	// 	if($his_rg_pay[$i]==0) $rg_commission=$rg_rate; else $rg_commission=0;
+	// 	$sm_commission_arr[$his_sm[$i]]+=$sm_commission;
+	// 	$rg_commission_arr[$his_rg[$i]]+=$rg_commission;
 		
-		if(($i%2)==0) $color='#EEEEEE'; else $color='#F9F9F9';
-		print '<tr bgcolor="'.$color.'"><td class="shipmentTB3" align="center"><a href="index.php?components='.$components.'&action=hp_active_list&invoice_no='.$his_inv[$i].'" style="text-decoration:none" >'.str_pad($his_inv[$i], 7, "0", STR_PAD_LEFT).'</a></td><td class="shipmentTB3"><a title="'.$his_cust[$i].'">'.$cust_name.'</a></td>';
-		print '<td class="shipmentTB3">'.ucfirst($his_sm[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($sm_commission).'</td>';
-		print '<td class="shipmentTB3">'.ucfirst($his_rg[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($rg_commission).'</td>';
-		print '<td class="shipmentTB3" align="right">'.number_format($his_hp_total[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($his_bill_total[$i]).'</td>';
-		print '</tr>';
+	// 	if(($i%2)==0) $color='#EEEEEE'; else $color='#F9F9F9';
+	// 	print '<tr bgcolor="'.$color.'"><td class="shipmentTB3" align="center"><a href="index.php?components='.$components.'&action=hp_active_list&invoice_no='.$his_inv[$i].'" style="text-decoration:none" >'.str_pad($his_inv[$i], 7, "0", STR_PAD_LEFT).'</a></td><td class="shipmentTB3"><a title="'.$his_cust[$i].'">'.$cust_name.'</a></td>';
+	// 	print '<td class="shipmentTB3">'.ucfirst($his_sm[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($sm_commission).'</td>';
+	// 	print '<td class="shipmentTB3">'.ucfirst($his_rg[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($rg_commission).'</td>';
+	// 	print '<td class="shipmentTB3" align="right">'.number_format($his_hp_total[$i]).'</td><td class="shipmentTB3" align="right">'.number_format($his_bill_total[$i]).'</td>';
+	// 	print '</tr>';
+	// }
+	if(isset($his_id) && is_array($his_id) && count($his_id) > 0) {
+    for($i=0; $i < count($his_id); $i++) {
+        if(strlen($his_cust[$i])>25) $cust_name=substr($his_cust[$i],0,25).'...'; else $cust_name=$his_cust[$i];
+        if($his_sm_pay[$i]==0) $sm_commission=$sm_rate; else $sm_commission=0;
+        if($his_rg_pay[$i]==0) $rg_commission=$rg_rate; else $rg_commission=0;
+        $sm_commission_arr[$his_sm[$i]]+=$sm_commission;
+        $rg_commission_arr[$his_rg[$i]]+=$rg_commission;
+        
+        if(($i%2)==0) $color='#EEEEEE'; else $color='#F9F9F9';
+        print '<tr bgcolor="'.$color.'"><td class="shipmentTB3" align="center"><a href="index.php?components='.$components.'&action=hp_active_list&invoice_no='.$his_inv[$i].'" style="text-decoration:none" >'.str_pad($his_inv[$i], 7, "0", STR_PAD_LEFT).'</a> Nos<td class="shipmentTB3"><a title="'.$his_cust[$i].'">'.$cust_name.'</a> Nos';
+        print '<td class="shipmentTB3">'.ucfirst($his_sm[$i]).' Nos<td class="shipmentTB3" align="right">'.number_format($sm_commission).' Nos';
+        print '<td class="shipmentTB3">'.ucfirst($his_rg[$i]).' Nos<td class="shipmentTB3" align="right">'.number_format($rg_commission).' Nos';
+        print '<td class="shipmentTB3" align="right">'.number_format($his_hp_total[$i]).' Nos<td class="shipmentTB3" align="right">'.number_format($his_bill_total[$i]).' Nos';
+        print '</tr>';
+    }
+	} else {
+		// Display a message when no data exists
+		print '<tr><td colspan="8" align="center">No records found</td></tr>';
 	}
 	print '</table>';
 	

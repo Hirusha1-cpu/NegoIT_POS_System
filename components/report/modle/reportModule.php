@@ -1143,7 +1143,7 @@ function getUnlockedBills2(){
 // 	}
 // }
 function getItembySalesman(){
-    global $from_date, $to_date, $item, $salesman, $soldqty;
+    global $from_date, $to_date, $item, $salesman, $soldqty, $conn2;
     
     // Initialize arrays to prevent null errors
     $salesman = [];
@@ -1258,7 +1258,7 @@ function setShipmentStatus($new_status){
 }
 
 function getUserAuditLog(){
-	global $username,$from_date,$to_date,$bill_no,$bill_lock,$bill_del_date,$bill_deleted_by,$tr1_no,$tr1_del_date,$tr1_deleted_by,$tr2_no,$tr2_del_date,$tr2_deleted_by,$sm_no,$sm_del_approve_by,$sm_del_approve_date,$sm_del_by,$sm_del_date,$itu_sm_no,$itu_sn,$itu_del_by,$itu_del_date;
+	global $username,$from_date,$to_date,$bill_no,$bill_lock,$bill_del_date,$bill_deleted_by,$tr1_no,$tr1_del_date,$tr1_deleted_by,$tr2_no,$tr2_del_date,$tr2_deleted_by,$sm_no,$sm_del_approve_by,$sm_del_approve_date,$sm_del_by,$sm_del_date,$itu_sm_no,$itu_sn,$itu_del_by,$itu_del_date, $conn2;
 	$bill_no=$tr1_no=$tr2_no=$sm_no=$itu_sm_no=array();
 	if(isset($_GET['username'])){
 	$username=$_GET['username'];
@@ -1317,7 +1317,7 @@ function getUserAuditLog(){
 }
 
 function getTransAuditLog(){
-	global $from_store,$to_store,$from_date,$to_date,$tr_no,$tr_date,$tr_status,$tr_total,$tr_from_user,$tr_remote_user,$tr_from_store,$tr_to_store;
+	global $from_store,$to_store,$from_date,$to_date,$tr_no,$tr_date,$tr_status,$tr_total,$tr_from_user,$tr_remote_user,$tr_from_store,$tr_to_store, $conn2;
 	$from_store=$to_store='';
 	$tr_no=array();
 	if(isset($_GET['from_date'])){

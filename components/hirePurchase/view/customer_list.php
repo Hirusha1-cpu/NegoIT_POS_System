@@ -41,10 +41,26 @@ function getHPInvoiceList($cust_id){
 	<table style="font-family:Calibri; font-size:12pt">
 	<tr style="background-color:#467898; color:white;"><th colspan="2">Customer Name</th></tr>
 	<?php 
-	for($i=0;$i<sizeof($his_cu_id);$i++){
-		if(($i%2)==0) $color='#FAFAFA'; else $color='#EEEEEE';
-		print '<tr style="background-color:'.$color.'"><td class="shipmentTB3"><input type="checkbox" /></td><td class="shipmentTB3"><a href="#div_inv" onclick="getHPInvoiceList('.$his_cu_id[$i].')" style="text-decoration:none; color:blue; cursor:pointer" >'.$his_cu_name[$i].'</a></td></tr>';
-	}
+	// for($i=0;$i<sizeof($his_cu_id);$i++){
+	// 	if(($i%2)==0) $color='#FAFAFA'; else $color='#EEEEEE';
+	// 	print '<tr style="background-color:'.$color.'"><td class="shipmentTB3"><input type="checkbox" /></td><td class="shipmentTB3"><a href="#div_inv" onclick="getHPInvoiceList('.$his_cu_id[$i].')" style="text-decoration:none; color:blue; cursor:pointer" >'.$his_cu_name[$i].'</a></td></tr>';
+	// }
+	if(isset($his_cu_id) && is_array($his_cu_id) && count($his_cu_id) > 0) {
+    for($i=0; $i < count($his_cu_id); $i++) {
+        if(($i%2)==0) $color='#FAFAFA'; else $color='#EEEEEE';
+        $customer_name = isset($his_cu_name[$i]) ? $his_cu_name[$i] : 'Unknown';
+        print '<tr style="background-color:'.$color.'">
+            <td class="shipmentTB3"><input type="checkbox" />\\
+            <td class="shipmentTB3">
+                <a href="#div_inv" onclick="getHPInvoiceList('.$his_cu_id[$i].')" style="text-decoration:none; color:blue; cursor:pointer">
+                    '.$customer_name.'
+                </a>
+            \\
+          </tr>';
+    }
+} else {
+    print '<tr><td colspan="2" align="center">No customers found</td></tr>';
+}
 	?>
 	</table>
 </td><td width="100px"></td><td width="300px" valign="top">

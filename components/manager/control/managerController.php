@@ -520,7 +520,7 @@ switch ($_REQUEST['action']) {
    //-----------------------------Chque_Postpone------------------------------------//
    case "chque_postpone":
       include_once 'components/manager/modle/managerModule.php';
-      getChqueNoa($sub_system, 1);
+      getChqueNo($sub_system, 1);
       getPostponedChque($sub_system);
       getChqueOne();
       include_once 'components/manager/view/chque_postpone.php';
@@ -650,7 +650,7 @@ switch ($_REQUEST['action']) {
 
    case "desc-list":
       include_once 'template/common.php';
-      listItem($sub_system);
+      listItema($sub_system);
       include_once 'template/ajax_list.php';
       break;
 

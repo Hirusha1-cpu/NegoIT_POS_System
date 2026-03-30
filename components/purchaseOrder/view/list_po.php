@@ -34,7 +34,7 @@
  		<td>&nbsp;&nbsp;'.$po_date[$i].'&nbsp;&nbsp;</td>
  		<td>&nbsp;&nbsp;'.$po_submited_date[$i].'&nbsp;&nbsp;</td>
  		<td>&nbsp;&nbsp;'.$po_sup[$i].'&nbsp;&nbsp;</td>
- 		<td align="right">&nbsp;&nbsp;'.number_format($po_cost[$i]).'&nbsp;&nbsp;</td>
+ 		<td align="right">&nbsp;&nbsp;'.number_format($po_cost[$i] ?? 0).'&nbsp;&nbsp;</td>
  		<td align="center" style="color:'.$po_color[$i].'">&nbsp;&nbsp;'.$po_status1[$i].'&nbsp;&nbsp;</td>
  	</tr>';
  } ?>

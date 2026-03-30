@@ -1261,7 +1261,7 @@ function getItemInTransfer()
 // added by nirmal 23_12_2024
 function getTransReport($sub_system)
 {
-	global $gtn_no, $from_store, $to_store, $username, $invoice_no, $description, $qty, $date, $time, $status, $gtn_status_temp, $gtn_status, $gtn_color, $fromdate, $todate;
+	global $gtn_no, $from_store, $to_store, $username, $invoice_no, $description, $qty, $date, $time, $status, $gtn_status_temp, $gtn_status, $gtn_color, $fromdate, $todate, $conn;
 	$gtn_no = $from_store = $to_store = $username = $invoice_no = $description = $qty = $date = $time = $gtn_status = $gtn_color = array();
 	include('config.php');
 	$conditions = []; // Array to hold individual conditions
@@ -1356,7 +1356,7 @@ function getTransReport($sub_system)
 // added by nirmal 23_12_2024
 function getTransSalesman($sub_system)
 {
-	global $sm_id, $sm_name;
+	global $sm_id, $sm_name, $conn2;
 	if ($sub_system == 'all')
 		$sub_system_qry = '';
 	else
@@ -1373,7 +1373,7 @@ function getTransSalesman($sub_system)
 // added by nirmal 23_12_2024
 function getTransSubSystem($sub_system)
 {
-	global $sb_id, $sb_name;
+	global $sb_id, $sb_name, $conn2;
 	include('config.php');
 	$user_id = $_COOKIE['user_id'];
 
